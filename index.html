@@ -19,9 +19,10 @@
        [HOME SCREEN]        الشاشة الرئيسية وقائمة المستويات
        [LEVEL ACCORDION]    أكورديون المستويات (A1..B1) وأقسامها الفرعية
        [STORY GRID/CARDS]   شبكة بطاقات القصص ووسمها وشريطها الملون
-       [WORD COUNTER]       شريط عداد الكلمات المتعلَّمة
        [REVIEW PANEL]       لوحة مراجعة الكلمات
        [QUIZ]               اختبار الكلمات (أزرار، شاشة، نتائج)
+       [MANDATORY STORY REVIEW] مراجعة إجبارية بعد كل قصة (فروقات/أفعال)
+       [GRAMMAR INDEX]      فهرس القواعد النحوية
        [WORD SEARCH]        أداة البحث عن الكلمات (ws-*)
        [PHRASAL VERBS]      الأفعال المركبة (pv-*)
        [DICTIONARY/DICTATION] القاموس التفاعلي والإملاء (dict-*)
@@ -29,6 +30,8 @@
        [PROGRESS BAR]       شريط تقدم القصة
        [DESKTOP/WIDE]       تنسيقات الشاشات العريضة (breakpoint)
        [STORY GENERATOR]    مولّد القصص العشوائي (gen-*)
+       [HOME BOTTOM NAV]    تحويل الشريط العلوي لشاشة المكتبة الرئيسية فقط
+       [CONFUSABLE WORDS LAB OVERLAY] نافذة مختبر الفروقات (أداة خارجية)
        ===================================================================== */
   :root{
     --cream:#F6F5FC;
@@ -280,7 +283,7 @@
     from{opacity:0; transform:translateY(10px);}
     to{opacity:1; transform:translateY(0);}
   }
-  /* ---- TOP BAR (theme + hard-words + back) ---- */
+  /* ---- [TOP BAR] (theme + hard-words + back) ---- */
   .card-top-bar{
     display:flex;
     align-items:center;
@@ -330,6 +333,7 @@
     margin-top:0;
     margin-bottom:18px;
   }
+  /* ---- [SCENE / LINES] ---- */
   .scene{
     margin-bottom:22px;
   }
@@ -372,7 +376,7 @@
     background:var(--soft);
   }
 
-  /* ---- SPEECH SETTINGS BAR ---- */
+  /* ---- [SPEECH SETTINGS] BAR ---- */
   .speech-settings{
     display:flex;
     align-items:center;
@@ -660,8 +664,199 @@
     from{opacity:0; transform:translateY(-6px);}
     to{opacity:1; transform:translateY(0);}
   }
+  /* ---- SENTENCE TAP-TO-TRANSLATE (اضغط على الجملة كاملة لترجمتها) ---- */
+  .en-tappable{
+    cursor:pointer;
+    border-radius:8px;
+    transition:background .18s var(--ease);
+  }
+  .en-tappable:hover{
+    background:var(--glass-bg);
+  }
+  /* ---- SENTENCE STRUCTURE BREAKDOWN (تفكيك تركيب الجملة النحوي الذكي) ---- */
+  .sentence-structure{
+    display:none;
+    margin-top:6px;
+    background:var(--soft);
+    border:1px solid var(--teal);
+    border-radius:10px;
+    padding:8px 12px;
+    direction:rtl;
+  }
+  .sentence-structure.shown{
+    display:block;
+    animation:arReveal .3s var(--ease);
+  }
+  .struct-item{
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+  }
+  .struct-item + .struct-item{
+    margin-top:8px;
+    padding-top:8px;
+    border-top:1px dashed var(--line);
+  }
+  .struct-label{
+    font-family:'Tajawal','Tahoma','Segoe UI',sans-serif;
+    font-weight:800;
+    font-size:12.5px;
+    color:var(--teal);
+    direction:ltr;
+    text-align:right;
+    unicode-bidi:plaintext;
+  }
+  .struct-explain{
+    font-family:'Tajawal','Tahoma','Segoe UI',sans-serif;
+    font-size:13.5px;
+    color:var(--ink);
+    line-height:1.7;
+  }
+  /* ---- STRUCTURE PANEL (شرح تراكيب الجملة + تمرين علمي، بمكان المشهد ونهاية القصة) ---- */
+  .struct-panel-wrap{
+    margin-top:14px;
+  }
+  .struct-panel-btn{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    width:100%;
+    padding:11px 16px;
+    background:linear-gradient(135deg, var(--teal), var(--terracotta));
+    border:none;
+    border-radius:12px;
+    color:#fff;
+    font-family:'Tajawal','Tahoma','Segoe UI',sans-serif;
+    font-weight:800;
+    font-size:14px;
+    cursor:pointer;
+    direction:rtl;
+    box-shadow:var(--shadow-card);
+    transition:transform .18s var(--ease), box-shadow .18s var(--ease);
+  }
+  .struct-panel-btn:hover{
+    transform:translateY(-2px);
+    box-shadow:var(--shadow-card-hover);
+  }
+  .struct-panel-count{
+    margin-right:auto;
+    background:rgba(255,255,255,0.25);
+    border-radius:20px;
+    padding:2px 9px;
+    font-size:12px;
+  }
+  .struct-panel{
+    max-height:0;
+    overflow:hidden;
+    transition:max-height .35s ease;
+  }
+  .struct-panel.open{
+    max-height:8000px;
+    margin-top:12px;
+  }
+  .struct-panel-intro{
+    font-family:'Tajawal','Tahoma','Segoe UI',sans-serif;
+    direction:rtl;
+    font-size:13px;
+    color:var(--ink);
+    opacity:0.8;
+    margin-bottom:12px;
+    line-height:1.6;
+  }
+  .struct-explain-card{
+    background:var(--card-bg);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:12px 14px;
+    margin-bottom:10px;
+  }
+  .struct-explain-card .struct-explain-label{
+    font-family:'Tajawal','Tahoma','Segoe UI',sans-serif;
+    font-weight:800;
+    font-size:13.5px;
+    color:var(--teal);
+    direction:rtl;
+    margin-bottom:4px;
+  }
+  .struct-explain-card .struct-explain-text{
+    font-family:'Tajawal','Tahoma','Segoe UI',sans-serif;
+    direction:rtl;
+    font-size:13.5px;
+    color:var(--ink);
+    line-height:1.7;
+    margin-bottom:8px;
+  }
+  .struct-examples{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+  }
+  .struct-ex-line{
+    background:var(--soft);
+    border-radius:8px;
+    padding:7px 10px;
+  }
+  .struct-ex-line .en{
+    font-size:13px;
+    color:var(--ink);
+  }
+  .struct-ex-line .ar{
+    font-family:'Tajawal','Tahoma','Segoe UI',sans-serif;
+    direction:rtl;
+    font-size:12.5px;
+    color:var(--terracotta);
+    margin-top:2px;
+  }
+  .struct-quiz-btn{
+    width:100%;
+    padding:10px;
+    background:var(--teal);
+    border:none;
+    border-radius:10px;
+    color:#fff;
+    font-family:'Tajawal','Tahoma','Segoe UI',sans-serif;
+    font-weight:700;
+    font-size:13.5px;
+    cursor:pointer;
+    margin-top:4px;
+  }
+  .struct-quiz-zone{
+    margin-top:6px;
+  }
+  .struct-quiz-question{
+    font-family:'Tajawal','Tahoma','Segoe UI',sans-serif;
+    direction:rtl;
+    font-weight:700;
+    font-size:14px;
+    color:var(--ink);
+    margin:6px 0;
+  }
+  .struct-quiz-sentence-en{
+    font-size:15px;
+    color:var(--ink);
+    background:var(--soft);
+    border-radius:10px;
+    padding:10px 12px;
+    margin-bottom:4px;
+  }
+  .struct-quiz-sentence-ar{
+    font-family:'Tajawal','Tahoma','Segoe UI',sans-serif;
+    direction:rtl;
+    font-size:13px;
+    color:var(--terracotta);
+    margin-bottom:10px;
+  }
+  .struct-quiz-result{
+    font-family:'Tajawal','Tahoma','Segoe UI',sans-serif;
+    direction:rtl;
+    text-align:center;
+    font-weight:800;
+    font-size:15px;
+    color:var(--teal);
+    padding:14px;
+  }
 
-  /* ---- PLAIN READ MODE: one connected flowing paragraph ---- */
+  /* ---- [PLAIN READ MODE]: one connected flowing paragraph ---- */
   .plain-scene{
     margin-bottom:18px;
   }
@@ -749,6 +944,7 @@
   }
   .plain-translate-all-icon:hover{border-color:var(--ink);}
   .plain-translate-all-icon.active{border-color:var(--ink); opacity:0.7;}
+  /* ---- [CHOICES] ---- */
   .choices{
     display:flex;
     flex-direction:column;
@@ -835,7 +1031,7 @@
     margin-bottom:16px;
   }
 
-  /* ---- HOME SCREEN ---- */
+  /* ---- [HOME SCREEN] ---- */
   .home-header{
     text-align:center;
     margin-bottom:28px;
@@ -877,7 +1073,7 @@
   }
 
 
-  /* ---- LEVEL ACCORDION ---- */
+  /* ---- [LEVEL ACCORDION] ---- */
   .levels-wrap{
     display:flex;
     flex-direction:column;
@@ -1097,7 +1293,7 @@
 
   .sticky-close-btn{
     position:fixed;
-    bottom:24px;
+    bottom:152px;
     right:20px;
     background:var(--card-bg);
     color:var(--ink);
@@ -1119,9 +1315,13 @@
     box-shadow:0 4px 18px rgba(0,0,0,0.26);
     transform:scale(1.08);
   }
+  @media (min-width:600px){
+    .sticky-close-btn{ bottom:170px; }
+  }
 
   .level-close-btn{ display:none; }
 
+  /* ---- [STORY GRID/CARDS] ---- */
   /* ---- LEVEL BADGES ---- */
   /* ---- LEVEL BADGE PILLS ---- */
   .level-tag{
@@ -1414,7 +1614,7 @@
     flex-shrink:0;
   }
 
-  /* ---- REVIEW PANEL ---- */
+  /* ---- [REVIEW PANEL] ---- */
   .review-btn{
     margin-top:10px;
     width:100%;
@@ -1499,7 +1699,7 @@
   }
   .review-line:hover .rev-ar{display:block;}
 
-  /* ---- QUIZ ---- */
+  /* ---- [QUIZ] ---- */
   // اختبار الكلمات الصعبة — يظهر بعد قراءة القصة
   // دوال: buildQuiz
   .quiz-btn{
@@ -2143,6 +2343,7 @@
     transition:opacity .15s;
   }
   .top-search-bar .ts-close:hover{opacity:1;}
+  /* ---- [WORD SEARCH] ---- */
   .ws-hero{text-align:center; margin-bottom:14px;}
   .ws-hero h2{font-family:'Poppins','Inter',sans-serif; font-size:1.5rem; color:var(--ink); margin:0 0 6px;}
   .ws-hero p{font-family:'Tajawal','Tahoma','Segoe UI', sans-serif; direction:rtl; color:var(--ink); opacity:0.65; font-size:0.88rem; margin:0;}
@@ -2210,7 +2411,7 @@
   .pv-item.ws-fuzzy-item{ border-style:dashed; opacity:0.92; }
 
   /* ==================================================================
-     PHRASAL VERBS LAB — الأفعال المركبة
+     [PHRASAL VERBS] LAB — الأفعال المركبة
      ================================================================== */
   .pv-main-btn{
     background:var(--soft);
@@ -2306,7 +2507,7 @@
   .pv-star-btn.added{border-color:#e6a800; color:#e6a800;}
 
   /* ==================================================================
-     DICTATION LAB — تمرين الإملاء والاستماع
+     [DICTIONARY/DICTATION] DICTATION LAB — تمرين الإملاء والاستماع
      ================================================================== */
   .dict-hero{
     text-align:center;
@@ -2713,7 +2914,7 @@
   }
   .practice-menu-item-locked .pmi-sub{opacity:0.9; font-style:italic;}
 
-  /* ---- HARD WORDS ---- */
+  /* ---- [HARD WORDS] ---- */
   .en .word.hard-word{
     background:linear-gradient(135deg,#f5c518,#e6a800);
     color:#1a1200;
@@ -2891,7 +3092,7 @@
   }
   .hw-speak-btn:hover{background:var(--line);}
 
-  /* ---- PROGRESS BAR ---- */
+  /* ---- [PROGRESS BAR] ---- */
   .scene-progress-wrap{
     width:100%;
     background:var(--line);
@@ -3211,7 +3412,7 @@
     body{padding:14px;}
   }
 
-  /* ---- DESKTOP / WIDE SCREENS: use the full page like a real website ---- */
+  /* ---- [DESKTOP/WIDE] DESKTOP / WIDE SCREENS: use the full page like a real website ---- */
   @media (min-width:1100px){
     body{
       padding:48px 64px;
@@ -3251,7 +3452,7 @@
   [data-theme="dark"] .level-box-b1\+{border-left:4px solid #e67700;}
 
   /* =====================================================================
-       STORY GENERATOR (مولّد القصص)
+       [STORY GENERATOR] (مولّد القصص)
      ===================================================================== */
   .gen-intro{
     font-family:'Tajawal','Tahoma','Segoe UI', sans-serif;
@@ -3488,7 +3689,7 @@
     position:fixed;
     left:50%;
     transform:translateX(-50%);
-    bottom:0;
+    bottom:56px;
     width:100%;
     max-width:920px;
     margin:0;
@@ -3515,7 +3716,7 @@
     display:none;
   }
   .card:has(> .card-top-bar.home-bottom-nav){
-    padding-bottom:96px;
+    padding-bottom:152px;
   }
   .card-top-bar.home-bottom-nav > button{
     background:transparent;
@@ -3557,7 +3758,7 @@
   @media (min-width:600px){
     .card-top-bar.home-bottom-nav{
       border-radius:24px;
-      bottom:18px;
+      bottom:74px;
       width:calc(100% - 36px);
     }
   }
@@ -3571,7 +3772,7 @@
   .more-tools-btn{ background:transparent; position:relative; }
   .more-tools-panel{
     position:fixed;
-    bottom:76px;
+    bottom:132px;
     left:50%;
     transform:translateX(-50%);
     width:min(260px, calc(100% - 32px));
@@ -3604,7 +3805,7 @@
   .more-tools-item:hover{ background:var(--soft); }
   .more-tools-item .mti-icon{ font-size:18px; }
   @media (min-width:600px){
-    .more-tools-panel{ bottom:94px; }
+    .more-tools-panel{ bottom:150px; }
   }
 
   /* ---- زر تبديل المستوى ---- */
@@ -3616,7 +3817,7 @@
   }
   .level-switch-panel{
     position:fixed;
-    bottom:76px;
+    bottom:132px;
     left:50%;
     transform:translateX(-50%);
     width:min(200px, calc(100% - 32px));
@@ -3646,7 +3847,7 @@
   .level-switch-option:hover{ background:var(--soft); }
   .level-switch-option.active{ font-weight:700; background:var(--soft); }
   @media (min-width:600px){
-    .level-switch-panel{ bottom:94px; }
+    .level-switch-panel{ bottom:150px; }
   }
 
   .cwl-main-btn{
@@ -3685,6 +3886,62 @@
     transition:transform .2s var(--ease);
   }
   .cwl-close-btn:hover{ transform:scale(1.08); }
+
+  /* ===== Suggestion Bar (شريط سفلي ثابت) ===== */
+  #suggestBar{
+    position:fixed; left:0; right:0; bottom:0; z-index:2000;
+    display:flex; align-items:center; justify-content:center;
+    background:var(--card-bg); border-top:1px solid var(--line);
+    box-shadow:0 -4px 16px rgba(46,42,94,0.08);
+    padding:10px 14px calc(10px + env(safe-area-inset-bottom));
+  }
+  #suggestBtn{
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    width:100%; max-width:420px; height:44px;
+    background:linear-gradient(135deg, var(--terracotta), var(--accent-2));
+    color:#fff; border:none; border-radius:var(--radius-sm);
+    font-family:Tahoma,sans-serif; font-size:14.5px; font-weight:700;
+    box-shadow:0 4px 14px rgba(124,111,234,0.35); cursor:pointer;
+  }
+  #suggestBtn svg{ width:19px; height:19px; flex-shrink:0; }
+  #suggestBtn:hover{ opacity:.94; }
+  #suggestBtn:active{ transform:scale(.98); }
+
+  #suggestOverlay{
+    display:none; position:fixed; inset:0; background:rgba(20,18,40,.55);
+    backdrop-filter:blur(3px); -webkit-backdrop-filter:blur(3px);
+    z-index:9999; align-items:center; justify-content:center; padding:20px; box-sizing:border-box;
+  }
+  #suggestModal{
+    background:var(--card-bg); border:1px solid var(--line); border-radius:var(--radius-lg);
+    padding:24px; width:100%; max-width:380px; box-shadow:var(--shadow-card-hover);
+    font-family:Tahoma,sans-serif; direction:rtl; text-align:right;
+    animation:screenFadeIn .22s var(--ease);
+  }
+  #suggestModal h3{ margin:0 0 4px; font-size:17px; color:var(--ink); font-weight:700; }
+  #suggestModal p.suggest-sub{ margin:0 0 16px; font-size:12.5px; color:#8b88a8; }
+  #suggestModal label{ display:block; font-size:12px; color:#8b88a8; margin-bottom:4px; }
+  #suggestModal input, #suggestModal textarea{
+    width:100%; box-sizing:border-box; margin-bottom:14px; padding:10px 12px;
+    border:1.5px solid var(--line); border-radius:var(--radius-sm); font-family:inherit;
+    font-size:14px; color:var(--ink); background:var(--soft); resize:vertical;
+    transition:border-color .2s var(--ease);
+  }
+  #suggestModal input:focus, #suggestModal textarea:focus{
+    outline:none; border-color:var(--terracotta); background:var(--card-bg);
+  }
+  #suggestActions{ display:flex; gap:10px; justify-content:flex-end; }
+  #suggestStatus{ margin:-6px 0 10px; font-size:12.5px; min-height:16px; }
+  #suggestStatus.success{ color:#1e9e5a; font-weight:700; }
+  #suggestStatus.error{ color:#d64545; font-weight:700; }
+  #suggestSend, #suggestCancel{
+    border:none; border-radius:var(--radius-sm); padding:10px 20px; cursor:pointer;
+    font-family:inherit; font-size:13.5px; font-weight:600; transition:transform .15s var(--ease), opacity .15s var(--ease);
+  }
+  #suggestSend{ background:linear-gradient(135deg, var(--terracotta), var(--accent-2)); color:#fff; }
+  #suggestSend:hover{ transform:translateY(-1px); opacity:.92; }
+  #suggestCancel{ background:var(--soft); color:var(--ink); }
+  #suggestCancel:hover{ background:var(--line); }
 </style>
 <!-- ===== END SECTION: Styles ===== -->
 </head>
@@ -3692,6 +3949,99 @@
 <noscript><div style="text-align:center;padding:40px;font-family:Tahoma,sans-serif;direction:rtl;font-size:16px;color:#555;">يتطلب هذا التطبيق تفعيل JavaScript في متصفحك.<br>This app requires JavaScript to be enabled.</div></noscript>
 
 <div class="wrap" id="app"></div>
+
+<!-- ===== SECTION: Suggestion Bar (mailto) ===== -->
+<div id="suggestBar">
+  <button id="suggestBtn" type="button" aria-label="أرسل اقتراحاتك">
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M4 4h16a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H8l-4 4V6a1 1 0 0 1 1-1z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="8.5" cy="10.5" r="1.1" fill="currentColor"/>
+      <circle cx="12" cy="10.5" r="1.1" fill="currentColor"/>
+      <circle cx="15.5" cy="10.5" r="1.1" fill="currentColor"/>
+    </svg>
+    <span>اقتراحاتك وملاحظاتك</span>
+  </button>
+</div>
+<div id="suggestOverlay">
+  <div id="suggestModal">
+    <h3>عندك اقتراح أو ملاحظة؟</h3>
+    <p class="suggest-sub">رأيك يساعدنا نطوّر التجربة أكثر</p>
+    <label for="suggestName">الاسم (اختياري)</label>
+    <input id="suggestName" type="text" placeholder="اكتب اسمك">
+    <label for="suggestEmail">إيميلك (اختياري - ليصلك رد)</label>
+    <input id="suggestEmail" type="email" placeholder="example@email.com">
+    <label for="suggestMsg">رسالتك</label>
+    <textarea id="suggestMsg" placeholder="اكتب اقتراحك هنا..." rows="4"></textarea>
+    <p id="suggestStatus"></p>
+    <div id="suggestActions">
+      <button id="suggestCancel" type="button">إلغاء</button>
+      <button id="suggestSend" type="button">إرسال</button>
+    </div>
+  </div>
+</div>
+<script>
+(function(){
+  var SUGGEST_EMAIL = "ot2516532@gmail.com";
+  var btn = document.getElementById('suggestBtn');
+  var overlay = document.getElementById('suggestOverlay');
+  var sendBtn = document.getElementById('suggestSend');
+  var cancelBtn = document.getElementById('suggestCancel');
+  var statusEl = document.getElementById('suggestStatus');
+
+  function resetStatus(){ statusEl.textContent = ''; statusEl.className = ''; }
+  btn.addEventListener('click', function(){ resetStatus(); overlay.style.display = 'flex'; });
+  cancelBtn.addEventListener('click', function(){ overlay.style.display = 'none'; });
+  overlay.addEventListener('click', function(e){ if(e.target === overlay) overlay.style.display = 'none'; });
+
+  sendBtn.addEventListener('click', function(){
+    var name = document.getElementById('suggestName').value.trim() || 'زائر';
+    var email = document.getElementById('suggestEmail').value.trim();
+    var msg = document.getElementById('suggestMsg').value.trim();
+    if(!msg){ statusEl.textContent = 'اكتب اقتراحك أولاً'; statusEl.className = 'error'; return; }
+
+    sendBtn.disabled = true;
+    sendBtn.textContent = 'جارِ الإرسال...';
+    statusEl.textContent = ''; statusEl.className = '';
+
+    var payload = {
+      name: name,
+      message: msg,
+      _subject: 'اقتراح جديد من ' + name,
+      _template: 'table',
+      _captcha: 'false'
+    };
+    if(email){ payload.email = email; payload._autoresponse = 'وصلنا اقتراحك، شكراً لك على وقتك! سنراجعه قريباً.'; }
+
+    fetch('https://formsubmit.co/ajax/' + SUGGEST_EMAIL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+    .then(function(r){ return r.json().then(function(d){ return { ok:r.ok, d:d }; }); })
+    .then(function(res){
+      sendBtn.disabled = false;
+      sendBtn.textContent = 'إرسال';
+      if(res.ok){
+        statusEl.textContent = 'تم الإرسال بنجاح، شكراً لك! ✔';
+        statusEl.className = 'success';
+        document.getElementById('suggestName').value = '';
+        document.getElementById('suggestEmail').value = '';
+        document.getElementById('suggestMsg').value = '';
+        setTimeout(function(){ overlay.style.display = 'none'; resetStatus(); }, 1800);
+      } else {
+        statusEl.textContent = 'تعذّر الإرسال، حاول مرة أخرى لاحقاً.';
+        statusEl.className = 'error';
+      }
+    })
+    .catch(function(){
+      sendBtn.disabled = false;
+      sendBtn.textContent = 'إرسال';
+      statusEl.textContent = 'تعذّر الاتصال، تحقق من الإنترنت وحاول مجدداً.';
+      statusEl.className = 'error';
+    });
+  });
+})();
+</script>
 
 <!-- ===== SECTION: Stories Data ===== -->
 <!-- =====================================================================
@@ -6503,6 +6853,10 @@
             "ar": "مايا عمرها 22 سنة. تقول بابتسامة: «اليوم يوم كبير!»"
           },
           {
+            "en": "She used to live in her parents' house, but now she has her own flat.",
+            "ar": "كانت تعيش في منزل والديها، لكن الآن لديها شقتها الخاصة."
+          },
+          {
             "en": "She has a new flat. \"A bedroom, a kitchen, and a bathroom — perfect!\" she thinks.",
             "ar": "لديها شقة جديدة. تفكر: «غرفة نوم ومطبخ وحمام — مثالي!»"
           },
@@ -6971,8 +7325,12 @@
             "ar": "يقول: «أهلاً بك في المبنى! هل تحتاجين كرسياً؟»"
           },
           {
-            "en": "\"I can invite you for tea another day,\" he says kindly.",
-            "ar": "يقول بلطف: «يمكنني دعوتك لشرب الشاي في يوم آخر.»"
+            "en": "On his shelf, Maya sees an old teddy bear. \"That was my daughter's,\" he says with a smile.",
+            "ar": "على رفّه، ترى مايا دبّاً محشواً قديماً. يقول بابتسامة: «كان هذا لابنتي.»"
+          },
+          {
+            "en": "\"I can invite you for tea, or a cold beer, another day,\" he says kindly.",
+            "ar": "يقول بلطف: «يمكنني دعوتك لشرب الشاي، أو جعة باردة، في يوم آخر.»"
           }
         ],
         "choices": [
@@ -7193,8 +7551,8 @@
             "ar": "تضع مايا الأريكة قرب النافذة. الشقة تبدو دافئة وجميلة."
           },
           {
-            "en": "She sits down and drinks tea. She feels calm and grateful.",
-            "ar": "تجلس وتشرب الشاي. تشعر بالهدوء والامتنان."
+            "en": "She sits down and drinks tea. She feels calm and happy.",
+            "ar": "تجلس وتشرب الشاي. تشعر بالهدوء والسعادة."
           },
           {
             "en": "\"This is my home now,\" she says with a big smile.",
@@ -8761,8 +9119,8 @@
             "ar": "يمسك القطع معاً بالمشبك. لكن هناك مشكلة — مسمار قديم عالق في عمق الخشب."
           },
           {
-            "en": "He uses the pliers to pull the nail out slowly. It is harder than he expected, and it takes almost an hour.",
-            "ar": "يستخدم الكماشة لسحب المسمار ببطء. الأمر أصعب مما توقع، ويستغرق ما يقارب الساعة."
+            "en": "He uses the pliers to pull the nail out slowly. It is harder than he thought, and it takes almost an hour.",
+            "ar": "يستخدم الكماشة لسحب المسمار ببطء. الأمر أصعب مما ظنّ، ويستغرق ما يقارب الساعة."
           },
           {
             "en": "Finally, the fence is fixed. But now Ali is tired, and his phone shows three missed calls from Noor.",
@@ -8917,8 +9275,8 @@
             "ar": "يطل سام العجوز، الجار، فوق الجدار. يقول بلطف: «تحتاج شوكة لتفكيك تلك التربة.»"
           },
           {
-            "en": "Sam lends Ali his fork. Together, they make the soil soft in a few minutes — much quicker than Ali expected.",
-            "ar": "يعير سام علياً شوكته. معاً، يجعلان التربة ناعمة في دقائق قليلة — أسرع بكثير مما توقع علي."
+            "en": "Sam lends Ali his fork. Together, they make the soil soft in a few minutes — much quicker than Ali thought.",
+            "ar": "يعير سام علياً شوكته. معاً، يجعلان التربة ناعمة في دقائق قليلة — أسرع بكثير مما ظنّ علي."
           },
           {
             "en": "\"Your flowers will grow much better in soil like this,\" Sam says.",
@@ -9062,6 +9420,10 @@
           {
             "en": "Some ducks swim close to the edge, hoping for bread.",
             "ar": "يسبح بعض البط قريباً من الحافة، على أمل الحصول على خبز."
+          },
+          {
+            "en": "A man rides past on a brown horse. \"Look!\" Noor says, pointing.",
+            "ar": "يمرّ رجل راكباً حصاناً بنياً. تقول نور مشيرة: «انظر!»"
           }
         ],
         "choices": [
@@ -9133,6 +9495,10 @@
           {
             "en": "Near the water, some older boys sail small paper boats — those boats move slow across the lake.",
             "ar": "قرب الماء، يُبحر بعض الصبية الأكبر سناً قوارب ورقية صغيرة — تلك القوارب تتحرك ببطء عبر البحيرة."
+          },
+          {
+            "en": "One boy has a toy ship. It is bigger than the paper boats.",
+            "ar": "لدى أحد الصبية سفينة لعبة. إنها أكبر من القوارب الورقية."
           },
           {
             "en": "Then the sky becomes dark. It starts to rain! \"Oh no!\" Noor says. \"Run!\" Ali says.",
@@ -9317,8 +9683,8 @@
             "ar": "بعد عشر دقائق، تصبح السماء صافية. يقول علي: «توقف المطر!» تقول نور: «لنذهب.»"
           },
           {
-            "en": "They walk home together, past the newly fixed fence. \"That was a little adventure — just like this morning,\" Ali says. They both laugh.",
-            "ar": "يمشيان إلى المنزل معاً، متجاوزَين السياج المُصلَح حديثاً. يقول علي: «كانت مغامرة صغيرة — تماماً مثل هذا الصباح.» يضحكان كلاهما."
+            "en": "They walk home together, past the newly fixed fence. \"That was a busy day — just like this morning,\" Ali says. They both laugh.",
+            "ar": "يمشيان إلى المنزل معاً، متجاوزَين السياج المُصلَح حديثاً. يقول علي: «كان يوماً مزدحماً — تماماً مثل هذا الصباح.» يضحكان كلاهما."
           }
         ]
       },
@@ -17335,6 +17701,10 @@
             "ar": "تفتح هدى مقررها. الدرس عن الجبال والأنهار."
           },
           {
+            "en": "The book has a picture of green mountains with white sheep on them.",
+            "ar": "في الكتاب صورة لجبال خضراء عليها أغنام بيضاء."
+          },
+          {
             "en": "Huda wants to learn more, so she draws a small map of the rivers in her notebook.",
             "ar": "تريد هدى أن تتعلم أكثر، فترسم خريطة صغيرة للأنهار في دفترها."
           },
@@ -17724,7 +18094,7 @@
         "title_ar": "النهاية: بداية قوية",
         "lines": [
           {
-            "en": "Huda shows her mark to Omar. \"Well done!\" he says, genuinely happy for her.",
+            "en": "Huda shows her mark to Omar. \"Well done!\" he says, very happy for her.",
             "ar": "تُري هدى علامتها لعمر. يقول: «أحسنت!» وهو سعيد لها بصدق."
           },
           {
@@ -18528,6 +18898,10 @@
             "ar": "إنه اليوم الرياضي في المدرسة. يجب على كل تلميذ الانضمام إلى فريق."
           },
           {
+            "en": "A small plane flies over the school field. The pupils were excited and loud.",
+            "ar": "تطير طائرة صغيرة فوق ملعب المدرسة. كان التلاميذ متحمسين وصاخبين."
+          },
+          {
             "en": "The coach shows a list: football, basketball, badminton, and swimming.",
             "ar": "يري المدرب قائمة: كرة قدم وكرة سلة وريشة طائرة وسباحة."
           },
@@ -18686,8 +19060,8 @@
             "ar": "يسأل تامر وهو يلاحظ وجه صديقه الهادئ: «هل تستمتع بهذا؟»"
           },
           {
-            "en": "Zaid hesitates. \"Honestly... I miss football,\" he admits.",
-            "ar": "يتردد زيد. يعترف: «بصراحة... اشتقت لكرة القدم.»"
+            "en": "Zaid stops for a moment. \"I miss football,\" he says.",
+            "ar": "يتوقف زيد للحظة. يقول: «اشتقت لكرة القدم.»"
           }
         ],
         "choices": [
@@ -18927,8 +19301,8 @@
             "ar": "يبقى زيد في كرة السلة من أجل تامر، رغم أنها ليست رياضته المفضلة."
           },
           {
-            "en": "He tries his best in every practice, and slowly he improves.",
-            "ar": "يبذل قصارى جهده في كل تدريب، وتدريجياً يتحسن."
+            "en": "He tries his best in every practice, and slowly he plays better.",
+            "ar": "يبذل قصارى جهده في كل تدريب، وتدريجياً يلعب بشكل أفضل."
           },
           {
             "en": "It is not football, but training with a good friend makes it enjoyable too.",
@@ -18988,8 +19362,8 @@
             "ar": "يفوز فريق زيد بالمباراة. يرفع بصره ويرى تامر يشجع بأعلى صوت بين الجميع."
           },
           {
-            "en": "\"You don't need the same team to be a good friend,\" Zaid realises, smiling.",
-            "ar": "يدرك زيد وهو يبتسم: «لا تحتاج نفس الفريق لتكون صديقاً جيداً.»"
+            "en": "\"You don't need the same team to be a good friend,\" Zaid says, smiling.",
+            "ar": "يقول زيد وهو يبتسم: «لا تحتاج نفس الفريق لتكون صديقاً جيداً.»"
           },
           {
             "en": "That evening, they eat together and talk about their two very different sports.",
@@ -20329,6 +20703,1291 @@
           {
             "en": "Their manager is impressed by their teamwork and increased efficiency.",
             "ar": "يُعجب مديرهما بعملهما الجماعي وكفاءتهما المتزايدة."
+          }
+        ]
+      }
+    }
+  },
+"layla_negotiation": {
+    "level": "B1",
+    "title": "The Big Negotiation",
+    "title_ar": "المفاوضة الكبرى",
+    "icon": "🤝",
+    "desc": "Sara is a professional sales manager who must handle a difficult client complaint and turn it into a successful negotiation.",
+    "desc_ar": "سارة مديرة مبيعات محترفة يجب أن تتعامل مع شكوى عميل صعبة وتحوّلها إلى مفاوضة ناجحة.",
+    "scenes": {
+      "start": {
+        "lines": [
+          {
+            "en": "Sara is a professional sales manager. Price complaints are common in her job, but this one feels complex.",
+            "ar": "سارة مديرة مبيعات محترفة. شكاوى الأسعار شائعة في عملها، لكن هذه الشكوى تبدو معقدة."
+          },
+          {
+            "en": "She receives an urgent message from an important client who already invested in three previous orders with the company.",
+            "ar": "تستلم رسالة عاجلة من عميل مهم استثمر بالفعل في ثلاث طلبيات سابقة مع الشركة."
+          },
+          {
+            "en": "Before she calls back, she quickly finishes a small errand at the reception desk.",
+            "ar": "قبل أن تعاود الاتصال، تنهي بسرعة مشواراً صغيراً عند مكتب الاستقبال."
+          },
+          {
+            "en": "The message says the client wants to complain about the last order.",
+            "ar": "تقول الرسالة إن العميل يريد أن يشتكي بخصوص الطلبية الأخيرة."
+          },
+          {
+            "en": "Sara knows how to multitask between calls, emails, and reports, but she must communicate clearly and respond calmly, not rush into the problem.",
+            "ar": "تعرف سارة كيف تنجز عدة مهام معاً بين المكالمات والإيميلات والتقارير، لكن عليها أن تتواصل بوضوح وتستجيب بهدوء، لا أن تتسرّع في المشكلة."
+          },
+          {
+            "en": "A weak response now could lose an important client forever.",
+            "ar": "استجابة ضعيفة الآن قد تفقدها عميلاً مهماً إلى الأبد."
+          }
+        ],
+        "questions": [
+          {
+            "en": "What is Sara's job?",
+            "ar": "ما هي وظيفة سارة؟",
+            "options": [
+              "A teacher",
+              "A professional sales manager",
+              "A doctor",
+              "A driver"
+            ],
+            "correct": 1
+          },
+          {
+            "en": "What does the client want to do?",
+            "ar": "ماذا يريد العميل أن يفعل؟",
+            "options": [
+              "Send a gift",
+              "Complain about the last order",
+              "Cancel the meeting",
+              "Ask for a job"
+            ],
+            "correct": 1
+          },
+          {
+            "en": "What must Sara avoid doing?",
+            "ar": "ماذا يجب أن تتجنبه سارة؟",
+            "options": [
+              "Rushing into the problem",
+              "Answering the phone",
+              "Writing a report",
+              "Going to lunch"
+            ],
+            "correct": 0
+          }
+        ],
+        "choices": [
+          {
+            "en": "Call the client right away to discuss the problem",
+            "ar": "اتصلي بالعميل فوراً لمناقشة المشكلة",
+            "next": "call_client"
+          },
+          {
+            "en": "Prepare a full report first, then respond",
+            "ar": "جهزي تقريراً كاملاً أولاً، ثم استجيبي",
+            "next": "prepare_report"
+          }
+        ]
+      },
+      "call_client": {
+        "lines": [
+          {
+            "en": "Sara wants to catch Mr. Khaled at a good moment, right after his morning meeting.",
+            "ar": "تريد سارة أن تُدرك السيد خالد في لحظة مناسبة، مباشرة بعد اجتماعه الصباحي."
+          },
+          {
+            "en": "She calls him right away. He argues that the price is too high and the cost is not fair.",
+            "ar": "تتصل به فوراً. يجادل بأن السعر مرتفع جداً وأن التكلفة غير عادلة."
+          },
+          {
+            "en": "\"This is not reasonable! I might boycott your company,\" he says.",
+            "ar": "يقول: «هذا غير معقول! قد أقاطع شركتكم.»"
+          }
+        ],
+        "questions": [
+          {
+            "en": "What does Mr. Khaled complain about?",
+            "ar": "بم يشتكي السيد خالد؟",
+            "options": [
+              "The color",
+              "The price and cost",
+              "The size",
+              "The speed"
+            ],
+            "correct": 1
+          },
+          {
+            "en": "What does Mr. Khaled threaten to do?",
+            "ar": "بماذا يهدد السيد خالد؟",
+            "options": [
+              "Sign a new contract",
+              "Boycott the company",
+              "Recommend the company",
+              "Invest more money"
+            ],
+            "correct": 1
+          }
+        ],
+        "choices": [
+          {
+            "en": "Explain the reasons behind the price",
+            "ar": "اشرحي أسباب هذا السعر",
+            "next": "explain_price"
+          },
+          {
+            "en": "Suggest a discount as a quick solution",
+            "ar": "اقترحي خصماً كحل سريع",
+            "next": "suggest_discount"
+          }
+        ]
+      },
+      "prepare_report": {
+        "lines": [
+          {
+            "en": "Sara decides to prepare a detailed report first.",
+            "ar": "تقرر سارة أن تُعِدّ تقريراً مفصّلاً أولاً."
+          },
+          {
+            "en": "The report includes the full process, the budget, and the final result of the order.",
+            "ar": "يتضمن التقرير العملية الكاملة والميزانية والنتيجة النهائية للطلبية."
+          },
+          {
+            "en": "She checks what discounts and options are available, and tries to think ahead of any objections.",
+            "ar": "تتحقق من الخصومات والخيارات المتاحة، وتحاول أن تفكر مسبقاً في أي اعتراضات."
+          },
+          {
+            "en": "She feels more organized and ready to negotiate.",
+            "ar": "تشعر بمزيد من التنظيم واستعداد للتفاوض."
+          }
+        ],
+        "questions": [
+          {
+            "en": "What does Sara prepare first?",
+            "ar": "ماذا تُعِدّ سارة أولاً؟",
+            "options": [
+              "A party",
+              "A detailed report",
+              "A new logo",
+              "A vacation plan"
+            ],
+            "correct": 1
+          },
+          {
+            "en": "What does the report include?",
+            "ar": "ماذا يتضمن التقرير؟",
+            "options": [
+              "Old photos",
+              "The process, budget and result",
+              "A movie",
+              "A song"
+            ],
+            "correct": 1
+          }
+        ],
+        "choices": [
+          {
+            "en": "Explain the process calmly to the client",
+            "ar": "اشرحي العملية بهدوء للعميل",
+            "next": "explain_process"
+          },
+          {
+            "en": "Offer to replace the damaged items",
+            "ar": "اعرضي استبدال القطع التالفة",
+            "next": "offer_replace"
+          }
+        ]
+      },
+      "explain_price": {
+        "lines": [
+          {
+            "en": "Sara explains the reason behind the price: better quality and faster delivery.",
+            "ar": "تشرح سارة سبب هذا السعر: جودة أفضل وتوصيل أسرع."
+          },
+          {
+            "en": "She stays professional and does not argue back.",
+            "ar": "تبقى محترفة ولا تجادل بالمقابل."
+          },
+          {
+            "en": "Mr. Khaled listens, but he is still not fully convinced.",
+            "ar": "يستمع السيد خالد، لكنه لا يزال غير مقتنع تماماً."
+          }
+        ],
+        "questions": [
+          {
+            "en": "What reason does Sara give for the price?",
+            "ar": "ما السبب الذي تقدمه سارة للسعر؟",
+            "options": [
+              "Nothing",
+              "Better quality and faster delivery",
+              "A lower salary",
+              "A mistake"
+            ],
+            "correct": 1
+          },
+          {
+            "en": "Is Mr. Khaled fully convinced?",
+            "ar": "هل اقتنع السيد خالد تماماً؟",
+            "options": [
+              "Yes, completely",
+              "No, not fully",
+              "He doesn't respond",
+              "He laughs"
+            ],
+            "correct": 1
+          }
+        ],
+        "choices": [
+          {
+            "en": "Move to a formal negotiation meeting",
+            "ar": "انتقلي إلى اجتماع تفاوض رسمي",
+            "next": "negotiate_meeting"
+          },
+          {
+            "en": "The client refuses and ends the call",
+            "ar": "يرفض العميل وينهي المكالمة",
+            "next": "end_client_boycott"
+          }
+        ]
+      },
+      "suggest_discount": {
+        "lines": [
+          {
+            "en": "Sara suggests a small discount as a quick solution.",
+            "ar": "تقترح سارة خصماً صغيراً كحل سريع."
+          },
+          {
+            "en": "She explains that a full refund is unavailable, but a fair discount is possible right now.",
+            "ar": "تشرح أن استرداد المبلغ كاملاً غير متاح، لكن خصماً عادلاً ممكن الآن."
+          },
+          {
+            "en": "Mr. Khaled likes the idea and starts to agree. \"This sounds fair,\" he says with a calmer voice.",
+            "ar": "تعجب الفكرة السيد خالد ويبدأ بالموافقة. يقول: «هذا يبدو عادلاً» بصوت أكثر هدوءاً."
+          }
+        ],
+        "questions": [
+          {
+            "en": "What does Sara suggest?",
+            "ar": "ماذا تقترح سارة؟",
+            "options": [
+              "A discount",
+              "A new client",
+              "A vacation",
+              "Nothing"
+            ],
+            "correct": 0
+          },
+          {
+            "en": "How does Mr. Khaled react to the discount?",
+            "ar": "كيف يتفاعل السيد خالد مع الخصم؟",
+            "options": [
+              "He refuses completely",
+              "He starts to agree",
+              "He shouts",
+              "He leaves"
+            ],
+            "correct": 1
+          }
+        ],
+        "choices": [
+          {
+            "en": "Confirm the agreement immediately",
+            "ar": "أكّدي الاتفاق فوراً",
+            "next": "end_quick_agreement"
+          },
+          {
+            "en": "Ask him to discuss more options in a meeting",
+            "ar": "اطلبي منه مناقشة المزيد من الخيارات في اجتماع",
+            "next": "negotiate_meeting"
+          }
+        ]
+      },
+      "explain_process": {
+        "lines": [
+          {
+            "en": "Sara explains the meaning of each step in the process, using a clear method.",
+            "ar": "تشرح سارة معنى كل خطوة في العملية، مستخدمة طريقة واضحة."
+          },
+          {
+            "en": "She shows the client the resources used and how tasks were allocated to the team.",
+            "ar": "تُظهر للعميل الموارد المستخدمة وكيف تم تخصيص المهام للفريق."
+          },
+          {
+            "en": "Mr. Khaled is no longer passive; he starts asking real questions, and he feels the company is professional and organized.",
+            "ar": "لم يعد السيد خالد سلبياً؛ يبدأ بطرح أسئلة حقيقية، ويشعر أن الشركة محترفة ومنظمة."
+          }
+        ],
+        "questions": [
+          {
+            "en": "What does Sara show the client?",
+            "ar": "ماذا تُظهر سارة للعميل؟",
+            "options": [
+              "Old emails",
+              "The resources used and task allocation",
+              "A photo album",
+              "Nothing"
+            ],
+            "correct": 1
+          },
+          {
+            "en": "How does Mr. Khaled change in this scene?",
+            "ar": "كيف يتغير السيد خالد في هذا المشهد؟",
+            "options": [
+              "He becomes angrier",
+              "He is no longer passive",
+              "He hangs up",
+              "He falls asleep"
+            ],
+            "correct": 1
+          }
+        ],
+        "choices": [
+          {
+            "en": "Move to the negotiation meeting",
+            "ar": "انتقلي إلى اجتماع التفاوض",
+            "next": "negotiate_meeting"
+          },
+          {
+            "en": "Answer one more direct question first",
+            "ar": "أجيبي عن سؤال مباشر آخر أولاً",
+            "next": "negotiate_meeting"
+          }
+        ]
+      },
+      "offer_replace": {
+        "lines": [
+          {
+            "en": "Sara offers to replace the damaged items immediately, at no extra cost.",
+            "ar": "تعرض سارة استبدال القطع التالفة فوراً، دون أي تكلفة إضافية."
+          },
+          {
+            "en": "Mr. Khaled feels respected and happy with the quick solution.",
+            "ar": "يشعر السيد خالد بالاحترام ويسعد بالحل السريع."
+          },
+          {
+            "en": "He says: \"This is a very effective and professional response.\"",
+            "ar": "يقول: «هذه استجابة فعّالة ومحترفة جداً.»"
+          }
+        ],
+        "questions": [
+          {
+            "en": "What does Sara offer?",
+            "ar": "ماذا تعرض سارة؟",
+            "options": [
+              "A discount only",
+              "To replace the damaged items",
+              "A new contract",
+              "Nothing"
+            ],
+            "correct": 1
+          },
+          {
+            "en": "How does Mr. Khaled feel about the offer?",
+            "ar": "كيف يشعر السيد خالد تجاه العرض؟",
+            "options": [
+              "Angry",
+              "Respected and happy",
+              "Confused",
+              "Bored"
+            ],
+            "correct": 1
+          }
+        ],
+        "choices": [
+          {
+            "en": "Confirm the replacement and close the deal",
+            "ar": "أكّدي الاستبدال وأغلقي الصفقة",
+            "next": "end_replace_success"
+          },
+          {
+            "en": "Ask him to discuss future orders too",
+            "ar": "اطلبي منه مناقشة الطلبيات المستقبلية أيضاً",
+            "next": "negotiate_meeting"
+          }
+        ]
+      },
+      "negotiate_meeting": {
+        "lines": [
+          {
+            "en": "In the meeting, Sara and Mr. Khaled discuss two options: a lower price or extra resources.",
+            "ar": "في الاجتماع، تناقش سارة والسيد خالد خيارين: سعر أقل أو موارد إضافية."
+          },
+          {
+            "en": "Mr. Khaled makes a formal request for a written agreement.",
+            "ar": "يقدّم السيد خالد طلباً رسمياً باتفاق مكتوب."
+          },
+          {
+            "en": "Sara's mind stays focused on finding a solution that is fair for both sides.",
+            "ar": "يبقى ذهن سارة مركّزاً على إيجاد حل عادل للطرفين."
+          },
+          {
+            "en": "Sara wants a deal where both sides feel equal, not just the company winning.",
+            "ar": "تريد سارة اتفاقاً يشعر فيه الطرفان بالمساواة، لا أن تفوز الشركة فقط."
+          },
+          {
+            "en": "She stays active in the conversation, always ready with a new idea. \"Let's find a method that works for both of us,\" she says.",
+            "ar": "تبقى نشطة في المحادثة، جاهزة دائماً بفكرة جديدة. تقول: «لنجد طريقة تناسبنا معاً.»"
+          }
+        ],
+        "questions": [
+          {
+            "en": "What two options do they discuss?",
+            "ar": "ما الخياران اللذان يناقشانهما؟",
+            "options": [
+              "A lower price or extra resources",
+              "A new car",
+              "A vacation",
+              "Nothing"
+            ],
+            "correct": 0
+          },
+          {
+            "en": "What does Mr. Khaled formally request?",
+            "ar": "ماذا يطلب السيد خالد رسمياً؟",
+            "options": [
+              "A gift",
+              "A written agreement",
+              "A new client",
+              "A day off"
+            ],
+            "correct": 1
+          },
+          {
+            "en": "What does Sara want from the deal?",
+            "ar": "ماذا تريد سارة من الصفقة؟",
+            "options": [
+              "Only the company to win",
+              "Both sides to feel equal",
+              "To end the meeting fast",
+              "Nothing"
+            ],
+            "correct": 1
+          }
+        ],
+        "choices": [
+          {
+            "en": "Discuss the budget and cost details",
+            "ar": "ناقشا تفاصيل الميزانية والتكلفة",
+            "next": "discuss_budget"
+          },
+          {
+            "en": "Propose a creative solution to the deadline problem",
+            "ar": "اقترحي حلاً إبداعياً لمشكلة الموعد النهائي",
+            "next": "propose_solution"
+          }
+        ]
+      },
+      "discuss_budget": {
+        "lines": [
+          {
+            "en": "They discuss the budget in detail. The client's budget is limited, but not impossible to work with.",
+            "ar": "يناقشان الميزانية بالتفصيل. ميزانية العميل محدودة، لكن ليس من المستحيل التعامل معها."
+          },
+          {
+            "en": "Sara suggests reducing some unnecessary costs to save money.",
+            "ar": "تقترح سارة تقليل بعض التكاليف غير الضرورية لتوفير المال."
+          },
+          {
+            "en": "Mr. Khaled mentions that his company donates part of its profit to cancer research every year.",
+            "ar": "يذكر السيد خالد أن شركته تتبرع بجزء من أرباحها لأبحاث مرض السرطان كل عام."
+          },
+          {
+            "en": "A satisfied client will keep buying, and the company will earn more in the future.",
+            "ar": "العميل الراضي سيستمر بالشراء، وستكسب الشركة أكثر في المستقبل."
+          }
+        ],
+        "questions": [
+          {
+            "en": "What is the client's budget like?",
+            "ar": "كيف هي ميزانية العميل؟",
+            "options": [
+              "Unlimited",
+              "Limited but possible",
+              "Zero",
+              "Huge"
+            ],
+            "correct": 1
+          },
+          {
+            "en": "What does Mr. Khaled's company do with part of its profit?",
+            "ar": "ماذا تفعل شركة السيد خالد بجزء من أرباحها؟",
+            "options": [
+              "Nothing",
+              "Donates it to cancer research",
+              "Hides it",
+              "Loses it"
+            ],
+            "correct": 1
+          }
+        ],
+        "choices": [
+          {
+            "en": "Reach a fair agreement",
+            "ar": "توصّلا إلى اتفاق عادل",
+            "next": "end_budget_agreement"
+          },
+          {
+            "en": "The client refuses and the deal ends in failure",
+            "ar": "يرفض العميل وتنتهي الصفقة بالفشل",
+            "next": "end_failure"
+          }
+        ]
+      },
+      "propose_solution": {
+        "lines": [
+          {
+            "en": "Sara proposes an effective solution: a new deadline and better task coordination.",
+            "ar": "تقترح سارة حلاً فعّالاً: موعد نهائي جديد وتنسيق أفضل للمهام."
+          },
+          {
+            "en": "She promises the team will not interrupt other clients' work and will manage the tasks well.",
+            "ar": "تعِد بأن الفريق لن يقاطع عمل عملاء آخرين وسيدير المهام جيداً."
+          },
+          {
+            "en": "This feels like a real breakthrough in the negotiation.",
+            "ar": "يبدو هذا وكأنه إنجاز حقيقي في المفاوضة."
+          }
+        ],
+        "questions": [
+          {
+            "en": "What does Sara propose?",
+            "ar": "ماذا تقترح سارة؟",
+            "options": [
+              "A new deadline and better coordination",
+              "A smaller price only",
+              "Nothing new",
+              "A new client"
+            ],
+            "correct": 0
+          },
+          {
+            "en": "What does this moment feel like?",
+            "ar": "بماذا تشبه هذه اللحظة؟",
+            "options": [
+              "A failure",
+              "A real breakthrough",
+              "A rare mistake",
+              "A common problem"
+            ],
+            "correct": 1
+          }
+        ],
+        "choices": [
+          {
+            "en": "The client agrees, and it becomes a great success",
+            "ar": "يوافق العميل، ويصبح نجاحاً كبيراً",
+            "next": "end_breakthrough"
+          },
+          {
+            "en": "The client accepts only part of the offer",
+            "ar": "يقبل العميل جزءاً فقط من العرض",
+            "next": "end_partial_success"
+          }
+        ]
+      },
+      "end_client_boycott": {
+        "ending": true,
+        "title": "Ending: The Boycott",
+        "title_ar": "النهاية: المقاطعة",
+        "lines": [
+          {
+            "en": "Mr. Khaled refuses to accept the reasons. He decides to boycott the company completely.",
+            "ar": "يرفض السيد خالد قبول الأسباب. يقرر مقاطعة الشركة تماماً."
+          },
+          {
+            "en": "This is a rare and difficult outcome, but Sara learns an important lesson about clear communication.",
+            "ar": "هذه نتيجة نادرة وصعبة، لكن سارة تتعلم درساً مهماً عن التواصل الواضح."
+          }
+        ]
+      },
+      "end_quick_agreement": {
+        "ending": true,
+        "title": "Ending: A Quick Agreement",
+        "title_ar": "النهاية: اتفاق سريع",
+        "lines": [
+          {
+            "en": "Sara confirms the discount, and Mr. Khaled agrees immediately.",
+            "ar": "تؤكد سارة الخصم، ويوافق السيد خالد فوراً."
+          },
+          {
+            "en": "It is a simple and effective solution, and both sides are satisfied.",
+            "ar": "إنه حل بسيط وفعّال، ويشعر الطرفان بالرضا."
+          }
+        ]
+      },
+      "end_replace_success": {
+        "ending": true,
+        "title": "Ending: A Successful Replacement",
+        "title_ar": "النهاية: استبدال ناجح",
+        "lines": [
+          {
+            "en": "The replacement is sent the same day. Mr. Khaled is impressed by the fast, professional response.",
+            "ar": "يُرسل الاستبدال في نفس اليوم. يُعجب السيد خالد بالاستجابة السريعة والمحترفة."
+          },
+          {
+            "en": "He even decides to recommend the company to other clients.",
+            "ar": "بل يقرر أيضاً أن يوصي بالشركة لعملاء آخرين."
+          }
+        ]
+      },
+      "end_budget_agreement": {
+        "ending": true,
+        "title": "Ending: A Fair Budget Agreement",
+        "title_ar": "النهاية: اتفاق ميزانية عادل",
+        "lines": [
+          {
+            "en": "After honest discussion, they agree on a new price that fits the client's budget.",
+            "ar": "بعد نقاش صريح، يتفقان على سعر جديد يناسب ميزانية العميل."
+          },
+          {
+            "en": "Finally, the negotiation is over, and both sides shake hands, feeling the deal was fair and effective.",
+            "ar": "أخيراً، تنتهي المفاوضة، ويتصافح الطرفان، شاعرَين أن الصفقة كانت عادلة وفعّالة."
+          }
+        ]
+      },
+      "end_failure": {
+        "ending": true,
+        "title": "Ending: A Difficult Failure",
+        "title_ar": "النهاية: فشل صعب",
+        "lines": [
+          {
+            "en": "Despite Sara's efforts, Mr. Khaled refuses the final offer, and the deal ends in failure.",
+            "ar": "رغم جهود سارة، يرفض السيد خالد العرض النهائي، وتنتهي الصفقة بالفشل."
+          },
+          {
+            "en": "Sara feels disappointed, but she knows this is a possible result in any negotiation.",
+            "ar": "تشعر سارة بخيبة أمل، لكنها تعرف أن هذه نتيجة ممكنة في أي مفاوضة."
+          }
+        ]
+      },
+      "end_breakthrough": {
+        "ending": true,
+        "title": "Ending: The Big Breakthrough",
+        "title_ar": "النهاية: الإنجاز الكبير",
+        "lines": [
+          {
+            "en": "Mr. Khaled agrees to everything. The new agreement becomes the most successful deal of the year.",
+            "ar": "يوافق السيد خالد على كل شيء. يصبح الاتفاق الجديد أنجح صفقة في العام."
+          },
+          {
+            "en": "Sara's manager is impressed by her efficient, professional performance — the success might even help her salary review this year.",
+            "ar": "يُعجب مدير سارة بأدائها الكفؤ والمحترف — قد يساعدها هذا النجاح حتى في مراجعة راتبها هذا العام."
+          }
+        ]
+      },
+      "end_partial_success": {
+        "ending": true,
+        "title": "Ending: A Partial Success",
+        "title_ar": "النهاية: نجاح جزئي",
+        "lines": [
+          {
+            "en": "Mr. Khaled accepts only part of the solution, but it is still a positive result.",
+            "ar": "يقبل السيد خالد جزءاً فقط من الحل، لكنها لا تزال نتيجة إيجابية."
+          },
+          {
+            "en": "Sara feels proud; even a partial agreement is considered a real success.",
+            "ar": "تشعر سارة بالفخر؛ فحتى الاتفاق الجزئي يُعتبر نجاحاً حقيقياً."
+          }
+        ]
+      }
+    }
+  },
+"tariq_new_routine": {
+    "level": "A2+",
+    "title": "Tariq's New Routine",
+    "title_ar": "روتين طارق الجديد",
+    "icon": "🌅",
+    "desc": "Tariq tends to procrastinate and feels overwhelmed by his chores. He tries to develop a new, organized daily routine.",
+    "desc_ar": "يميل طارق إلى المماطلة ويشعر بالإرهاق من أعماله الروتينية. يحاول تطوير روتين يومي منظم.",
+    "scenes": {
+      "start": {
+        "lines": [
+          {
+            "en": "Tariq tends to procrastinate. Every morning, he postpones his chores until the last minute, and he easily feels overwhelmed.",
+            "ar": "يميل طارق إلى المماطلة. كل صباح، يؤجل أعماله الروتينية حتى اللحظة الأخيرة، ويشعر بالإرهاق بسهولة."
+          },
+          {
+            "en": "Today, he decides to develop a new habit: an organized daily routine.",
+            "ar": "اليوم، يقرر أن يطوّر عادة جديدة: روتيناً يومياً منظماً."
+          },
+          {
+            "en": "\"A good schedule is necessary, not unnecessary,\" he tells himself.",
+            "ar": "يقول لنفسه: «جدول جيد أمر ضروري، وليس غير ضروري.»"
+          }
+        ],
+        "questions": [
+          {
+            "en": "What does Tariq tend to do every morning?",
+            "ar": "ماذا يميل طارق لفعله كل صباح؟",
+            "options": [
+              "Wake up early",
+              "Postpone his chores",
+              "Exercise",
+              "Cook breakfast"
+            ],
+            "correct": 1
+          },
+          {
+            "en": "What does Tariq decide to develop?",
+            "ar": "ماذا يقرر طارق أن يطوّر؟",
+            "options": [
+              "A new car",
+              "An organized daily routine",
+              "A new job",
+              "A new phone"
+            ],
+            "correct": 1
+          },
+          {
+            "en": "What does Tariq say about a schedule?",
+            "ar": "ماذا يقول طارق عن الجدول؟",
+            "options": [
+              "It is unnecessary",
+              "It is necessary",
+              "It is boring",
+              "It is impossible"
+            ],
+            "correct": 1
+          }
+        ],
+        "choices": [
+          {
+            "en": "Start with his morning grooming routine",
+            "ar": "ابدأ بروتين العناية الصباحي",
+            "next": "morning_grooming"
+          },
+          {
+            "en": "Start by making a clear daily schedule",
+            "ar": "ابدأ بوضع جدول يومي واضح",
+            "next": "make_schedule"
+          }
+        ]
+      },
+      "morning_grooming": {
+        "lines": [
+          {
+            "en": "Tariq uses his razor to shave, then trims his short beard carefully.",
+            "ar": "يستخدم طارق موس الحلاقة ليحلق، ثم يهذّب لحيته القصيرة بعناية."
+          },
+          {
+            "en": "He dries his hair quickly with the hairdryer, then uses nail clippers and floss before leaving the bathroom.",
+            "ar": "يجفف شعره بسرعة بمجفف الشعر، ثم يستخدم مقص الأظافر وخيط تنظيف الأسنان قبل مغادرة الحمام."
+          },
+          {
+            "en": "This simple habit makes him feel active and ready for a productive day.",
+            "ar": "هذه العادة البسيطة تجعله يشعر بالنشاط والاستعداد ليوم منتج."
+          }
+        ],
+        "questions": [
+          {
+            "en": "What does Tariq use to shave?",
+            "ar": "ماذا يستخدم طارق ليحلق؟",
+            "options": [
+              "A razor",
+              "A knife",
+              "Scissors",
+              "A spoon"
+            ],
+            "correct": 0
+          },
+          {
+            "en": "What does he use before leaving the bathroom?",
+            "ar": "ماذا يستخدم قبل مغادرة الحمام؟",
+            "options": [
+              "Nail clippers and floss",
+              "A blanket",
+              "A schedule",
+              "A taxi"
+            ],
+            "correct": 0
+          }
+        ],
+        "choices": [
+          {
+            "en": "Finish quickly and leave on time",
+            "ar": "أنهِ بسرعة وغادر في الوقت المحدد",
+            "next": "quick_prep"
+          },
+          {
+            "en": "Take his time and risk being late",
+            "ar": "خذ وقتك مع مخاطرة التأخر",
+            "next": "slow_prep"
+          }
+        ]
+      },
+      "make_schedule": {
+        "lines": [
+          {
+            "en": "Tariq writes a clear schedule. He includes work tasks, chores, and some leisure time.",
+            "ar": "يكتب طارق جدولاً واضحاً. يُدرج فيه مهام العمل والأعمال الروتينية وبعض وقت الفراغ."
+          },
+          {
+            "en": "He learns to prioritize his most necessary tasks first, and checks which time slots are available for the important one.",
+            "ar": "يتعلم أن يرتب أولوياته لأهم المهام الضرورية أولاً، ويتحقق من الأوقات المتاحة للمهمة المهمة."
+          },
+          {
+            "en": "His top priority is finishing an important task before its deadline. Everything unnecessary goes to the bottom of the list.",
+            "ar": "أولويته الأولى إنهاء مهمة مهمة قبل موعدها النهائي. كل ما هو غير ضروري ينتقل إلى أسفل القائمة."
+          }
+        ],
+        "questions": [
+          {
+            "en": "What does Tariq include in his schedule?",
+            "ar": "ماذا يُدرج طارق في جدوله؟",
+            "options": [
+              "Work, chores, and leisure time",
+              "Only games",
+              "Nothing",
+              "Only sleep"
+            ],
+            "correct": 0
+          },
+          {
+            "en": "What is Tariq's top priority?",
+            "ar": "ما أولوية طارق الأولى؟",
+            "options": [
+              "Watching TV",
+              "Finishing an important task before the deadline",
+              "Cleaning the car",
+              "Calling friends"
+            ],
+            "correct": 1
+          }
+        ],
+        "choices": [
+          {
+            "en": "Follow the schedule strictly",
+            "ar": "التزم بالجدول بصرامة",
+            "next": "strict_plan"
+          },
+          {
+            "en": "Keep the plans flexible",
+            "ar": "أبقِ الخطط مرنة",
+            "next": "flexible_plan"
+          }
+        ]
+      },
+      "quick_prep": {
+        "lines": [
+          {
+            "en": "Tariq finishes his morning routine quickly and grabs his bag.",
+            "ar": "ينهي طارق روتينه الصباحي بسرعة ويحمل حقيبته."
+          },
+          {
+            "en": "Once he finishes, he never looks back. He folds his blanket, checks his plans one more time, and heads out the door a few minutes ahead of schedule.",
+            "ar": "بمجرد أن ينتهي، لا ينظر إلى الوراء أبداً. يطوي بطانيته، يتحقق من خططه مرة أخيرة، ويغادر الباب قبل الموعد بدقائق قليلة."
+          }
+        ],
+        "questions": [
+          {
+            "en": "What does Tariq do before leaving?",
+            "ar": "ماذا يفعل طارق قبل المغادرة؟",
+            "options": [
+              "Folds his blanket and checks his plans",
+              "Watches TV",
+              "Cooks dinner",
+              "Calls a friend"
+            ],
+            "correct": 0
+          }
+        ],
+        "choices": [
+          {
+            "en": "Walk fast to catch the bus",
+            "ar": "امشِ بسرعة للحاق بالحافلة",
+            "next": "daily_commute"
+          },
+          {
+            "en": "Do a quick errand before leaving",
+            "ar": "قم بمشوار سريع قبل المغادرة",
+            "next": "do_errand_then_work"
+          }
+        ]
+      },
+      "strict_plan": {
+        "lines": [
+          {
+            "en": "Tariq follows his strict schedule exactly. Every minute is organized and planned.",
+            "ar": "يلتزم طارق بجدوله الصارم تماماً. كل دقيقة منظمة ومخطط لها."
+          },
+          {
+            "en": "He feels confident that his day will be efficient.",
+            "ar": "يشعر بالثقة أن يومه سيكون كفؤاً."
+          }
+        ],
+        "questions": [
+          {
+            "en": "How does Tariq follow his schedule?",
+            "ar": "كيف يلتزم طارق بجدوله؟",
+            "options": [
+              "Strictly and exactly",
+              "Randomly",
+              "Never",
+              "Only on weekends"
+            ],
+            "correct": 0
+          }
+        ],
+        "choices": [
+          {
+            "en": "Head out early to catch the bus",
+            "ar": "غادر مبكراً للحاق بالحافلة",
+            "next": "daily_commute"
+          },
+          {
+            "en": "Do a quick errand before leaving",
+            "ar": "قم بمشوار سريع قبل المغادرة",
+            "next": "do_errand_then_work"
+          }
+        ]
+      },
+      "slow_prep": {
+        "lines": [
+          {
+            "en": "Tariq takes his time in the bathroom, and the minutes pass quickly.",
+            "ar": "يأخذ طارق وقته في الحمام، وتمر الدقائق بسرعة."
+          },
+          {
+            "en": "Now he is running late, and he must rush.",
+            "ar": "الآن أصبح متأخراً، ويجب أن يتسرّع."
+          }
+        ],
+        "questions": [
+          {
+            "en": "Why must Tariq rush?",
+            "ar": "لماذا يجب أن يتسرّع طارق؟",
+            "options": [
+              "He is running late",
+              "He is bored",
+              "He wants exercise",
+              "He lost his keys"
+            ],
+            "correct": 0
+          }
+        ],
+        "choices": [
+          {
+            "en": "Rush to catch the bus anyway",
+            "ar": "تسرّع للحاق بالحافلة رغم ذلك",
+            "next": "daily_commute_late"
+          },
+          {
+            "en": "Call a taxi instead",
+            "ar": "اتصل بتاكسي بدلاً من ذلك",
+            "next": "daily_commute_late"
+          }
+        ]
+      },
+      "flexible_plan": {
+        "lines": [
+          {
+            "en": "Tariq keeps his plans flexible, which feels relaxing at first.",
+            "ar": "يبقي طارق خططه مرنة، وهو ما يشعره بالراحة في البداية."
+          },
+          {
+            "en": "But with no strict schedule, he loses a few important minutes.",
+            "ar": "لكن دون جدول صارم، يخسر بضع دقائق مهمة."
+          }
+        ],
+        "questions": [
+          {
+            "en": "What happens with a flexible plan?",
+            "ar": "ماذا يحدث مع الخطة المرنة؟",
+            "options": [
+              "Tariq loses a few important minutes",
+              "Nothing changes",
+              "He finishes early",
+              "He sleeps all day"
+            ],
+            "correct": 0
+          }
+        ],
+        "choices": [
+          {
+            "en": "Rush to catch the bus",
+            "ar": "تسرّع للحاق بالحافلة",
+            "next": "daily_commute_late"
+          },
+          {
+            "en": "Call a taxi instead",
+            "ar": "اتصل بتاكسي بدلاً من ذلك",
+            "next": "daily_commute_late"
+          }
+        ]
+      },
+      "do_errand_then_work": {
+        "lines": [
+          {
+            "en": "Before work, Tariq quickly finishes a necessary errand, like an efficient professional already active in his day.",
+            "ar": "قبل العمل، ينهي طارق بسرعة مشواراً ضرورياً، مثل محترف كفؤ نشيط بالفعل في يومه."
+          },
+          {
+            "en": "Tariq's commute to work is short, so there is still enough time.",
+            "ar": "تنقّل طارق إلى العمل قصير، لذا لا يزال هناك وقت كافٍ."
+          }
+        ],
+        "questions": [
+          {
+            "en": "What does Tariq finish before work?",
+            "ar": "ماذا ينهي طارق قبل العمل؟",
+            "options": [
+              "A necessary errand",
+              "A vacation",
+              "A meal",
+              "A movie"
+            ],
+            "correct": 0
+          }
+        ],
+        "choices": [
+          {
+            "en": "Head straight to the office now",
+            "ar": "توجّه مباشرة إلى المكتب الآن",
+            "next": "at_work"
+          },
+          {
+            "en": "Enjoy a short coffee break, a little leisure before work",
+            "ar": "استمتع باستراحة قهوة قصيرة، قليل من وقت الفراغ قبل العمل",
+            "next": "end_efficient_morning"
+          }
+        ]
+      },
+      "daily_commute": {
+        "lines": [
+          {
+            "en": "Tariq leaves home with plenty of time. He walks fast and manages to catch the bus easily.",
+            "ar": "يغادر طارق المنزل ولديه وقت كافٍ. يمشي بسرعة وينجح في اللحاق بالحافلة بسهولة."
+          },
+          {
+            "en": "His commute to work gives him a few quiet minutes to think about his tasks for the day.",
+            "ar": "يمنحه تنقّله إلى العمل بضع دقائق هادئة ليفكر في مهام يومه."
+          }
+        ],
+        "questions": [
+          {
+            "en": "How does Tariq catch the bus?",
+            "ar": "كيف يلحق طارق بالحافلة؟",
+            "options": [
+              "Easily, with plenty of time",
+              "He misses it",
+              "By running the whole way",
+              "He doesn't take the bus"
+            ],
+            "correct": 0
+          }
+        ],
+        "choices": [
+          {
+            "en": "Use the commute time to review his plans",
+            "ar": "استخدم وقت التنقل لمراجعة خططه",
+            "next": "at_work"
+          },
+          {
+            "en": "Do a quick errand before work",
+            "ar": "قم بمشوار سريع قبل العمل",
+            "next": "do_errand_then_work"
+          }
+        ]
+      },
+      "daily_commute_late": {
+        "lines": [
+          {
+            "en": "Tariq leaves a little late. He must rush to catch the bus before it leaves, and it feels stressful for a moment.",
+            "ar": "يغادر طارق متأخراً قليلاً. عليه أن يتسرّع للحاق بالحافلة قبل أن تغادر، ويشعر بالتوتر للحظة."
+          },
+          {
+            "en": "He catches the taxi at the last moment. It costs more, but at least he won't be too late. He feels a bit weak and tired already.",
+            "ar": "يلحق بالتاكسي في اللحظة الأخيرة. تكلف أكثر، لكنه على الأقل لن يتأخر كثيراً. يشعر بضعف وتعب بالفعل."
+          }
+        ],
+        "questions": [
+          {
+            "en": "Why does Tariq feel stressed?",
+            "ar": "لماذا يشعر طارق بالتوتر؟",
+            "options": [
+              "He must rush to catch the bus",
+              "He is happy",
+              "He finished early",
+              "He lost his phone"
+            ],
+            "correct": 0
+          }
+        ],
+        "choices": [
+          {
+            "en": "Just catch the bus in time",
+            "ar": "اكتفِ باللحاق بالحافلة في الوقت المناسب",
+            "next": "at_work_late"
+          },
+          {
+            "en": "Take the taxi and arrive a bit calmer",
+            "ar": "خذ التاكسي وصل بهدوء أكبر قليلاً",
+            "next": "at_work_late"
+          }
+        ]
+      },
+      "at_work": {
+        "lines": [
+          {
+            "en": "At the office, there is an important task with a tight deadline. Tariq feels ready, not overwhelmed like before.",
+            "ar": "في المكتب، هناك مهمة مهمة بموعد نهائي ضيق. يشعر طارق بالاستعداد، لا بالإرهاق كما في السابق."
+          },
+          {
+            "en": "He receives a message from his manager about the task's priority, and decides to coordinate with his team for good efficiency and coordination on the shared project.",
+            "ar": "يستلم رسالة من مديره حول أولوية المهمة، ويقرر التنسيق مع فريقه لتحقيق كفاءة وتنسيق جيدين في المشروع المشترك."
+          },
+          {
+            "en": "His performance today already feels increased compared to yesterday.",
+            "ar": "يشعر أن أداءه اليوم قد ازداد بالفعل مقارنة بالأمس."
+          }
+        ],
+        "questions": [
+          {
+            "en": "How does Tariq feel about the task?",
+            "ar": "كيف يشعر طارق تجاه المهمة؟",
+            "options": [
+              "Overwhelmed",
+              "Ready, not overwhelmed",
+              "Bored",
+              "Angry"
+            ],
+            "correct": 1
+          },
+          {
+            "en": "What does Tariq decide to do with his team?",
+            "ar": "ماذا يقرر طارق مع فريقه؟",
+            "options": [
+              "Ignore them",
+              "Coordinate for good efficiency",
+              "Argue with them",
+              "Leave the project"
+            ],
+            "correct": 1
+          }
+        ],
+        "choices": [
+          {
+            "en": "Focus completely on the task alone",
+            "ar": "ركّز تماماً على المهمة بمفردك",
+            "next": "end_great_performance"
+          },
+          {
+            "en": "Multitask between the task and helping a coworker",
+            "ar": "أنجز عدة مهام بين المهمة ومساعدة زميل",
+            "next": "end_balanced_day"
+          }
+        ]
+      },
+      "at_work_late": {
+        "lines": [
+          {
+            "en": "Tariq arrives a few minutes late. His manager notices, but he quickly responds with an apology and gets to work.",
+            "ar": "يصل طارق متأخراً بضع دقائق. يلاحظ مديره ذلك، لكنه يستجيب بسرعة باعتذار ويبدأ العمل."
+          },
+          {
+            "en": "He feels he must reduce distractions and focus, even though the morning was not perfect.",
+            "ar": "يشعر أنه يجب أن يقلل من المشتتات ويركّز، رغم أن الصباح لم يكن مثالياً."
+          }
+        ],
+        "questions": [
+          {
+            "en": "How does Tariq respond to being late?",
+            "ar": "كيف يستجيب طارق للتأخر؟",
+            "options": [
+              "He responds with an apology and works",
+              "He goes home",
+              "He ignores his manager",
+              "He argues"
+            ],
+            "correct": 0
+          }
+        ],
+        "choices": [
+          {
+            "en": "Push hard and finish the task anyway",
+            "ar": "اجتهد وأنهِ المهمة رغم ذلك",
+            "next": "end_recovery"
+          },
+          {
+            "en": "Feel overwhelmed and ask for a short break",
+            "ar": "اشعر بالإرهاق واطلب استراحة قصيرة",
+            "next": "end_overwhelmed"
+          }
+        ]
+      },
+      "end_efficient_morning": {
+        "ending": true,
+        "title": "Ending: An Efficient Morning",
+        "title_ar": "النهاية: صباح فعّال",
+        "lines": [
+          {
+            "en": "Tariq finishes his errand and reaches work early, feeling calm and productive.",
+            "ar": "ينهي طارق مشواره ويصل إلى العمل مبكراً، شاعراً بالهدوء والإنتاجية."
+          },
+          {
+            "en": "It is a small win, but it makes the whole day feel easier.",
+            "ar": "إنه انتصار صغير، لكنه يجعل اليوم كله يبدو أسهل."
+          }
+        ]
+      },
+      "end_great_performance": {
+        "ending": true,
+        "title": "Ending: Great Performance",
+        "title_ar": "النهاية: أداء رائع",
+        "lines": [
+          {
+            "en": "Tariq finishes the task before the deadline, alone and focused.",
+            "ar": "ينهي طارق المهمة قبل الموعد النهائي، بمفرده وبتركيز."
+          },
+          {
+            "en": "His manager is impressed by his increased efficiency and performance this week.",
+            "ar": "يُعجب مديره بكفاءته وأدائه المتزايدين هذا الأسبوع."
+          }
+        ]
+      },
+      "end_balanced_day": {
+        "ending": true,
+        "title": "Ending: A Balanced Day",
+        "title_ar": "النهاية: يوم متوازن",
+        "lines": [
+          {
+            "en": "Tariq multitasks well between his own task and helping a coworker. He and his manager agree that a balanced schedule works best.",
+            "ar": "ينجز طارق مهامه المتعددة جيداً بين مهمته الخاصة ومساعدة زميل. يتفق هو ومديره على أن الجدول المتوازن هو الأفضل."
+          },
+          {
+            "en": "By evening, he still finds time for his chores, an errand, and a little leisure before bed.",
+            "ar": "بحلول المساء، لا يزال يجد وقتاً لأعماله الروتينية ومشوار وقليل من وقت الفراغ قبل النوم."
+          }
+        ]
+      },
+      "end_recovery": {
+        "ending": true,
+        "title": "Ending: A Strong Recovery",
+        "title_ar": "النهاية: تعافٍ قوي",
+        "lines": [
+          {
+            "en": "Even after a late start, Tariq responds quickly and finishes his task on time.",
+            "ar": "حتى بعد بداية متأخرة، يستجيب طارق بسرعة وينهي مهمته في الوقت المحدد."
+          },
+          {
+            "en": "His manager considers it a strong recovery and a sign of good habits forming.",
+            "ar": "يعتبره مديره تعافياً قوياً وعلامة على تكوّن عادات جيدة."
+          }
+        ]
+      },
+      "end_overwhelmed": {
+        "ending": true,
+        "title": "Ending: A Heavy Day",
+        "title_ar": "النهاية: يوم مرهق",
+        "lines": [
+          {
+            "en": "The late start makes Tariq feel weak and overwhelmed by the end of the day.",
+            "ar": "البداية المتأخرة تجعل طارق يشعر بالضعف والإرهاق بحلول نهاية اليوم."
+          },
+          {
+            "en": "He decides that tomorrow, he needs a stricter, more organized schedule.",
+            "ar": "يقرر أنه غداً، يحتاج إلى جدول أكثر صرامة وتنظيماً."
           }
         ]
       }
@@ -24077,11 +25736,72 @@
   "teammate": "زميل فريق",
   "decreases": "يقل",
   "postpone": "يؤجل",
-  "loan": "قرض"
+  "loan": "قرض",
+"complex": "معقد",
+  "equal": "متساوٍ",
+  "breakthrough": "إنجاز/اختراق",
+  "cancer": "مرض السرطان",
+  "considered": "يُعتبر",
+  "multitask": "يُنجز عدة مهام معاً",
+  "ahead": "إلى الأمام/مسبقاً",
+  "errand": "مشوار",
+  "interrupt": "يقاطع",
+  "boycott": "يقاطع (شراء)",
+  "allocate": "يخصص",
+  "resources": "موارد",
+  "communication": "تواصل",
+  "leisure": "وقت الفراغ",
+  "productive": "منتج/ذو إنتاجية",
+  "clippers": "مقص أظافر",
+  "floss": "خيط تنظيف الأسنان",
+  "commute": "يتنقل يومياً للعمل",
+  "unnecessary": "غير ضروري",
+  "rare": "نادر",
+  "invest": "يستثمر",
+  "unavailable": "غير متاح",
+  "budget": "ميزانية",
+  "profit": "ربح",
+  "efficient": "كفؤ",
+  "effective": "فعّال",
+  "passive": "سلبي/غير نشيط"
 }
 </script>
 <!-- ===== SECTION: JavaScript Logic ===== -->
 <script>
+/* =====================================================================
+   فهرس قسم JavaScript (TOC) — دليل تنقّل سريع بدون تعديل أي كود
+   ابحث عن رقم السطر أو اسم الدالة الأولى للانتقال مباشرة للقسم
+   =====================================================================
+   1.  زر الرجوع + وضع المالك + إعدادات عامة ............ 24283
+   2.  أدوات مساعدة عامة (shuffle/levenshtein/highlights) . 24436
+   3.  أدوات القصة الأساسية + مراجعة القصة الإلزامية ..... 25033
+   4.  التقدم المحفوظ (تقدم/كلمات صعبة/الستريك) .......... 25362
+   5.  نظام SRS التفصيلي (الجدولة والاستحقاق) ............ 25479
+   6.  الجلسة اليومية الذكية .............................. 25664
+   7.  قوائم التمارين الرئيسية ............................ 25956
+   8.  البحث عن الكلمات ................................... 26195
+   9.  الأفعال المركّبة (Phrasal Verbs) ................... 26526
+   10. البطاقات التعليمية والإملاء ........................ 26670
+   11. لوحة الكلمات الصعبة + اتجاه الاختبار ............... 27101
+   12. محرك التمارين العام (MCQ/Recall/Flashcards) ........ 27342
+   13. أدوات نصية + مجمعات كلمات + شاشات الاستدعاء/التصنيف  27781
+   14. الاحتفال (كونفيتي/رنين) ............................ 28055
+   15. حالة تقدم القصة والمستوى ............................ 28106
+   16. المظهر (Theme) ..................................... 28403
+   17. النطق الصوتي (Speech/TTS) ........................... 28434
+   18. نافذة الكلمة + لون الكلام + وضع القراءة + بناء النص . 28678
+   19. الصفحة الرئيسية (Home) ............................. 29018
+   20. الفهرس النحوي ....................................... 29723
+   21. مولّد القصص ......................................... 29867
+   22. تشغيل القصة ومسارات النهايات ........................ 30737
+   23. وضع القراءة البسيط (Plain Story) .................... 30817
+   24. فحص الاستيعاب ....................................... 31084
+   25. تحليل التركيب اللغوي ................................ 31238
+   26. عرض المشهد (renderScene — القلب الرئيسي) ........... 31462
+   27. أدوات التشخيص ومختبر الكلمات المتشابهة .............. 31936
+   ملاحظة: الأرقام تقريبية وقد تزيد قليلاً بعد إضافة هذا الفهرس نفسه؛
+   يُفضّل البحث باسم الدالة الأولى لكل قسم إن اختلف الرقم بأسطر قليلة.
+   ===================================================================== */
 /* =====================================================================
      UNIFIED BACK BUTTON (زر العودة الموحّد — المصدر الوحيد لكل الملف)
      دالة واحدة تبني زر "↩" بنفس الشكل والسلوك في كل شاشات التطبيق،
@@ -24089,6 +25809,7 @@
      الوجهة (onClick) تبقى خاصة بكل شاشة كما كانت — لا تغيير وظيفي.
      دوال: createBackToggle
      ===================================================================== */
+/* ===== SECTION: 1. زر الرجوع + وضع المالك + إعدادات عامة ===== */
 function createBackToggle(onClick, opts){
   opts = opts || {};
   const btn = document.createElement('button');
@@ -24242,6 +25963,7 @@ if(OWNER_MODE){
      دالة خلط عشوائي واحدة موحّدة (Fisher-Yates) تُستخدم في كل الاختبارات
      بدل sort(() => Math.random() - 0.5) غير الصحيحة إحصائياً.
      ===================================================================== */
+/* ===== SECTION: 2. أدوات مساعدة عامة (shuffle/levenshtein/highlights) ===== */
 function shuffleArray(arr){
   const a = [...arr];
   for(let i = a.length - 1; i > 0; i--){
@@ -24839,18 +26561,19 @@ const STORY_REVIEW_BOX_INTERVALS = [0, 1, 3, 7, 16];
 const STORY_CONFUSABLE_SRS_KEY = 'storyConfusablePairsSRS_v1';
 const STORY_PHRASAL_SRS_KEY = 'storyPhrasalVerbsSRS_v1';
 
+/* ===== SECTION: 3. أدوات القصة الأساسية + مراجعة القصة الإلزامية ===== */
 function srsToday(){ return new Date().toISOString().slice(0,10); }
 function srsDaysFromNow(n){ const d = new Date(); d.setDate(d.getDate()+n); return d.toISOString().slice(0,10); }
-function loadSRS(key){ try{ return JSON.parse(localStorage.getItem(key)) || {}; }catch(e){ return {}; } }
-function saveSRS(key, s){ try{ localStorage.setItem(key, JSON.stringify(s)); }catch(e){} }
+function loadKeyedSRS(key){ try{ return JSON.parse(localStorage.getItem(key)) || {}; }catch(e){ return {}; } }
+function saveKeyedSRS(key, s){ try{ localStorage.setItem(key, JSON.stringify(s)); }catch(e){} }
 function getSRSState(store, id){ return store[id] || { box:0, due: srsToday() }; }
 function recordSRSResult(key, id, wasCorrect){
-  const store = loadSRS(key);
+  const store = loadKeyedSRS(key);
   const st = getSRSState(store, id);
   st.box = wasCorrect ? Math.min(st.box+1, STORY_REVIEW_BOX_INTERVALS.length-1) : 0;
   st.due = srsDaysFromNow(STORY_REVIEW_BOX_INTERVALS[st.box]);
   store[id] = st;
-  saveSRS(key, store);
+  saveKeyedSRS(key, store);
 }
 
 function getStoryRawText(story){
@@ -24869,7 +26592,7 @@ function wordInText(word, text){
    (Leitner)، ثم الأقل إتقاناً (box أصغر)، ضمن ما ورد فعلياً في القصة. */
 function pickPriorityItems(items, key, idFn, cap){
   if(cap <= 0 || !items.length) return [];
-  const store = loadSRS(key);
+  const store = loadKeyedSRS(key);
   const scored = items.map(it=>{
     const id = idFn(it);
     const st = getSRSState(store, id);
@@ -25168,6 +26891,7 @@ const HARD_WORDS_KEY = 'hardWords_v1';
 const AUTO_ADDED_KEY = 'autoAddedWords_v1';
 const LEARNED_KEY = 'learnedWords_v1';
 
+/* ===== SECTION: 4. التقدم المحفوظ (تقدم/كلمات صعبة/الستريك) ===== */
 function loadProgress(){
   try{
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -25285,6 +27009,7 @@ function getStreakData(){ return STREAK_DATA; }
 const SRS_KEY = 'srsData_v2';
 const SRS_INTERVALS = [0, 1, 3, 7, 16, 35, 75, 150]; // أيام — نفس تدرج مفكرة سجاد
 const SRS_LEVELS = ['new', 'hard', 'medium', 'easy'];
+/* ===== SECTION: 5. نظام SRS التفصيلي (الجدولة والاستحقاق) ===== */
 function loadSRS(){
   try{
     const raw = localStorage.getItem(SRS_KEY);
@@ -25470,6 +27195,7 @@ function examAllowed(examId){
      (Testing Effect؛ Roediger & Karpicke 2006).
      دوال: openSmartDailySession
      ===================================================================== */
+/* ===== SECTION: 6. الجلسة اليومية الذكية ===== */
 function openSmartDailySession(){
   app.innerHTML = '';
   const sCard = document.createElement('div');
@@ -25762,6 +27488,7 @@ function openSmartDailySession(){
      الأفعال المركبة، اختبار حسب الفئة، استرجاع حسب الفئة، مختبر الفروقات
      دوال: openOtherExercisesMenu
      ===================================================================== */
+/* ===== SECTION: 7. قوائم التمارين الرئيسية ===== */
 function openOtherExercisesMenu(){
   app.innerHTML = '';
   const oCard = document.createElement('div');
@@ -26001,6 +27728,7 @@ function openVocabReviewMenu(){
   renderThemeIcon();
 }
 
+/* ===== SECTION: 8. البحث عن الكلمات ===== */
 function openWordSearchScreen(initialQuery){
   app.innerHTML = '';
   const wCard = document.createElement('div');
@@ -26332,6 +28060,7 @@ function buildWordSearch(card, initialQuery){
      يعرض بطاقات PHRASAL_VERBS مع فلترة وبحث
      دوال: openPhrasalVerbsScreen | buildPhrasalVerbs | buildPvCard
      ===================================================================== */
+/* ===== SECTION: 9. الأفعال المركّبة (Phrasal Verbs) ===== */
 function openPhrasalVerbsScreen(){
   app.innerHTML = '';
   const pCard = document.createElement('div');
@@ -26476,6 +28205,7 @@ function buildPhrasalVerbs(card){
      يستخدم srsSchedule الموجود لتحديث موعد المراجعة عبر SRS
      دوال: openFlashcardsScreen | buildFlashcards
      ===================================================================== */
+/* ===== SECTION: 10. البطاقات التعليمية والإملاء ===== */
 function openFlashcardsScreen(){
   app.innerHTML = '';
   const fCard = document.createElement('div');
@@ -26907,6 +28637,7 @@ function buildDictation(card){
      HARD WORDS: REFRESH + PANEL (تحديث تلوين الكلمات الصعبة ولوحتها)
      دوال: refreshAllGoldenWords | renderHardWordsPanel
      ===================================================================== */
+/* ===== SECTION: 11. لوحة الكلمات الصعبة + اتجاه الاختبار ===== */
 function refreshAllGoldenWords(){
   document.querySelectorAll('.en .word').forEach(span => {
     /* Use stored data-key when available — avoids regex stripping spaces in multi-word spans */
@@ -27148,6 +28879,7 @@ function getStoryVocabWords(story){
   return [...seen];
 }
 
+/* ===== SECTION: 12. محرك التمارين العام (MCQ/Recall/Flashcards) ===== */
 function runExercise(config){
   const card = config.card;
   const mode = config.mode;
@@ -27587,6 +29319,7 @@ function runExercise(config){
      مع نظام SRS الموجود عبر srsSchedule.
      دوال: normalizeArabic | levenshtein
      ===================================================================== */
+/* ===== SECTION: 13. أدوات نصية + مجمعات كلمات + شاشات الاستدعاء/التصنيف ===== */
 function normalizeArabic(s){
   return (s || '')
     .toString()
@@ -27860,7 +29593,7 @@ function openCategoryQuizScreen(){
   renderThemeIcon();
 }
 
-/* ---- CELEBRATION EFFECTS (صوت + كونفيتي عند نهاية جديدة) ---- */
+/* ===== SECTION: 14. تأثيرات الاحتفال (صوت + كونفيتي عند نهاية جديدة) ===== */
 function playCelebrationChime(){
   try{
     const Ctx = window.AudioContext || window.webkitAudioContext;
@@ -27912,6 +29645,7 @@ function celebrateNewEnding(card, progBar){
   playCelebrationChime();
 }
 
+/* ===== SECTION: 15. حالة تقدم القصة والمستوى ===== */
 function getStoryState(storyId){
   if(!PROGRESS[storyId]){
     PROGRESS[storyId] = { historyStack: ['start'], completed:false, discoveredEndings: [], lastPlayedAt: 0 };
@@ -28024,6 +29758,7 @@ function b1StageProgressLabel(kind){
   return null;
 }
 
+/* ===== SECTION: 16. كلمات المستوى وحالة القفل/الإتقان ===== */
 /* ---- كلمات مستوى معيّن (لعزل التمارين حسب المستوى) ---- */
 /* تجمع كل الكلمات الفريدة من line.en لكل قصص هذا المستوى (بما فيها
    مستويات "+" المدموجة، مثلاً A1 تشمل أيضاً قصص A1+)، وتُخزَّن مؤقتاً
@@ -28240,6 +29975,7 @@ try {
   _speechVoiceName = localStorage.getItem('speechVoiceName') || '';
 } catch(e){}
 
+/* ===== SECTION: 17. النطق الصوتي (Speech/TTS) ===== */
 function _getVoiceByName(name){
   if(!('speechSynthesis' in window) || !name) return null;
   try{ return window.speechSynthesis.getVoices().find(v => v.name === name) || null; }catch(e){ return null; }
@@ -28484,6 +30220,7 @@ function buildSpeechSettings(){
   // تظهر عند الضغط على كلمة في القصة
   // دوال: buildWordSpans | closeActiveWordPopup
 let activeWordPopup = null;
+/* ===== SECTION: 18. نافذة الكلمة + لون الكلام + وضع القراءة + بناء النص ===== */
 function closeActiveWordPopup(){
   if(activeWordPopup){
     activeWordPopup.popup.remove();
@@ -28824,6 +30561,7 @@ function buildWordSpans(text){
      ===================================================================== */
 const app = document.getElementById('app');
 
+/* ===== SECTION: 19. الصفحة الرئيسية (Home) ===== */
 function renderHome(){
   currentStoryId = null;
   /* إلغاء وضع تركيز القراءة تلقائياً عند الرجوع للمكتبة — كان يبقى مفعّلاً
@@ -28939,7 +30677,13 @@ function renderHome(){
   syncSettingsThemeRow();
   settingsBtn.onclick = (e) => {
     e.stopPropagation();
-    settingsPanel.classList.toggle('open');
+    const willOpen = !settingsPanel.classList.contains('open');
+    settingsPanel.classList.toggle('open', willOpen);
+    if(willOpen){
+      settingsLevelList.classList.add('open');
+      settingsLevelToggle.classList.add('open');
+      settingsLevelToggle.setAttribute('aria-expanded', 'true');
+    }
   };
   document.addEventListener('click', (e) => {
     if(!settingsPanel.contains(e.target) && e.target !== settingsBtn){
@@ -29529,6 +31273,7 @@ function renderHome(){
      محدد. تعتمد على بيانات GRAMMAR_CATEGORIES و GRAMMAR_INDEX أعلاه.
      دوال: openGrammarIndex | buildGrammarStoryItem
      ===================================================================== */
+/* ===== SECTION: 20. الفهرس النحوي ===== */
 function buildGrammarStoryItem(id){
   const story = STORIES[id];
   if(!story) return null;
@@ -29656,6 +31401,7 @@ function openGrammarIndex(){
   renderThemeIcon();
 }
 
+/* ===== SECTION: 21. مولّد القصص (Story Generator) ===== */
 /* =====================================================================
      STORY GENERATOR (مولّد القصص)
      نموذج أولي: يركّب قصة قصيرة عشوائية من بنك كلمات وقوالب جمل،
@@ -30543,6 +32289,7 @@ function renderGenerator(){
   document.getElementById('gen-copy-btn').onclick = genCopyStory;
 }
 
+/* ===== SECTION: 22. تشغيل القصة ومسارات النهايات ===== */
 function openStory(storyId){
   if(!isStoryUnlocked(storyId)){
     alert('🔒 أكمل القصة السابقة في هذا المستوى أولاً لفتح هذه القصة.');
@@ -30623,6 +32370,7 @@ function isScenarioUnlocked(storyId, endingSceneId){
   return discovered.includes(prevEndingId);
 }
 
+/* ===== SECTION: 23. وضع القراءة البسيط (Plain Story) ===== */
 function openPlainStory(storyId){
   if(!isStoryUnlocked(storyId)){
     alert('🔒 أكمل القصة السابقة في هذا المستوى أولاً لفتح هذه القصة.');
@@ -30903,6 +32651,7 @@ function renderPlainStory(storyId, pathIndex){
      دوال: loadComprehensionPassed | isComprehensionPassed |
            markComprehensionPassed | buildComprehensionCheck
      ===================================================================== */
+/* ===== SECTION: 24. فحص الاستيعاب ===== */
 function loadComprehensionPassed(){
   try{ return JSON.parse(localStorage.getItem('comprehensionPassed') || '{}'); }catch(e){ return {}; }
 }
@@ -31044,6 +32793,232 @@ function buildComprehensionCheck(scene, storyId, sceneId, onAllPassed){
   return wrap;
 }
 
+/* =====================================================================
+     SENTENCE STRUCTURE ANALYZER (محرك ذكي لتفكيك تركيب الجملة)
+     يتعرّف تلقائياً على أشهر التراكيب النحوية داخل أي جملة إنجليزية
+     ويشرحها بالعربية — يُستخدم عند الضغط على الجملة أثناء القراءة.
+     دالة: analyzeSentenceStructure(en)
+     ===================================================================== */
+const SENTENCE_STRUCTURE_PATTERNS = [
+  { test:/\bso\s+(\w+)\s+that\b/i, label:'so + صفة/حال + that',
+    explain:(m)=>`"so ${m[1]} that" — بلغت الصفة/الحال درجة أدّت إلى نتيجة معيّنة، وتُترجم "لدرجة أنّ".` },
+  { test:/\bsuch\s+(a\s+|an\s+)?([\w\s]+?)\s+that\b/i, label:'such (a/an) + اسم + that',
+    explain:(m)=>`"such ${m[1]||''}${m[2]} that" — نفس معنى so...that لكن مع اسم بدل صفة، وتُترجم "لدرجة أنّ".` },
+  { test:/\bnot only\b[\s\S]*\bbut also\b/i, label:'not only ... but also',
+    explain:()=>`"not only ... but also" — تركيب تأكيدي يضيف معلومة ثانية أقوى من الأولى، وتُترجم "ليس فقط ... بل أيضاً".` },
+  { test:/\bwould rather\b[\s\S]*\bthan\b/i, label:'would rather ... than',
+    explain:()=>`"would rather ... than" — تفضيل فعل على آخر، وتُترجم "أُفضّل ... على أنْ".` },
+  { test:/\bbe\s+used to\s+\w+ing\b|'m used to|'re used to|\bis used to\b|\bare used to\b|\bwas used to\b|\bwere used to\b/i,
+    label:'be used to + ing (معتاد على)',
+    explain:()=>`"be used to + ing" — معتاد على شيء في الوقت الحالي (وليس عادة ماضية)، وتُترجم "معتاد على".` },
+  { test:/\bused to\s+\w+/i, label:'used to + فعل (عادة ماضية)',
+    explain:()=>`"used to" — عادة أو حالة كانت موجودة في الماضي وتوقفت الآن، وتُترجم "كان يعتاد على / كان سابقاً".` },
+  { test:/\bhad better\b/i, label:'had better',
+    explain:()=>`"had better" — نصيحة قوية أو تحذير، وتُترجم "من الأفضل أنْ / يُستحسن أنْ".` },
+  { test:/\bif\b[\s\S]*\b(would|could|might)\b/i, label:'If + ماضي، would + فعل (الشرط الثاني)',
+    explain:()=>`جملة شرطية افتراضية غير حقيقية عن الحاضر أو المستقبل، وتُترجم "لو ... لكان".` },
+  { test:/\bif\b[\s\S]*\bwill\b/i, label:'If + مضارع، will + فعل (الشرط الأول)',
+    explain:()=>`جملة شرطية حقيقية محتملة الحدوث، وتُترجم "إذا ... فسوف".` },
+  { test:/\bby the time\b/i, label:'by the time',
+    explain:()=>`"by the time" — حدث انتهى قبل حدوث حدث آخر، وتُترجم "بحلول وقت / عندما".` },
+  { test:/\bas soon as\b/i, label:'as soon as',
+    explain:()=>`"as soon as" — فور حدوث شيء يحدث شيء آخر مباشرة، وتُترجم "حالما / بمجرد أنْ".` },
+  { test:/\b(even though|although|though)\b/i, label:'although / even though (رغم أنّ)',
+    explain:()=>`تركيب تنازلي يوضّح تناقضاً بين فكرتين، وتُترجم "رغم أنّ / مع أنّ".` },
+  { test:/\bin order to\b|\bso as to\b/i, label:'in order to / so as to',
+    explain:()=>`يوضّح الهدف أو الغرض من الفعل، وتُترجم "لكي / من أجل أنْ".` },
+  { test:/\btoo\s+(\w+)\s+to\s+\w+/i, label:'too + صفة + to + فعل',
+    explain:(m)=>`"too ${m[1]} to" — درجة زائدة عن الحد تمنع حدوث الفعل، وتُترجم "أكثر من اللازم لدرجة إنه ما يقدر".` },
+  { test:/\b(\w+)\s+enough\s+to\s+\w+/i, label:'صفة + enough + to + فعل',
+    explain:(m)=>`"${m[1]} enough to" — درجة كافية لحدوث الفعل، وتُترجم "كافٍ بما يكفي لكي".` },
+  { test:/\bhas\s+been\b|\bhave\s+been\b|\bhad\s+been\b/i, label:'المضارع/الماضي التام المستمر',
+    explain:()=>`فعل مستمر منذ فترة حتى نقطة معيّنة — يربط بين الماضي والحاضر أو بين حدثين ماضيين.` },
+  { test:/\b(has|have)\s+\w+ed\b/i, label:'Present Perfect (المضارع التام)',
+    explain:()=>`فعل حدث في وقت غير محدد قبل الآن، لكن أثره أو نتيجته ما زالت مهمة الآن.` },
+  { test:/\b(was|were|is|are)\s+\w+ed\s+by\b/i, label:'المبني للمجهول (Passive Voice)',
+    explain:()=>`التركيز على الفعل والمفعول به بدل الفاعل، وتُترجم "تمّ فعل كذا من قِبل".` },
+  { test:/,\s*(who|which|that)\s+\w+/i, label:'جملة وصل غير محصورة (Relative Clause)',
+    explain:(m)=>`"${m[1]}" تربط هنا جملة وصفية إضافية بالاسم قبلها، وتُترجم عادة "الذي/التي".` }
+];
+
+/* ===== SECTION: 25. تحليل التركيب اللغوي ===== */
+function analyzeSentenceStructure(en){
+  const results = [];
+  const seen = new Set();
+  SENTENCE_STRUCTURE_PATTERNS.forEach(p => {
+    const m = en.match(p.test);
+    if(m && !seen.has(p.label)){
+      seen.add(p.label);
+      results.push({ label:p.label, explain:p.explain(m) });
+    }
+  });
+  return results;
+}
+
+/* ---- تجميع كل التراكيب المكتشَفة ضمن مجموعة جمل، مع أمثلة فعلية من القصة ---- */
+function collectStructurePatternsFromLines(lines){
+  const map = new Map();
+  lines.forEach(l => {
+    analyzeSentenceStructure(l.en).forEach(m => {
+      if(!map.has(m.label)) map.set(m.label, { label:m.label, explain:m.explain, examples:[] });
+      const entry = map.get(m.label);
+      if(entry.examples.length < 3 && !entry.examples.some(e => e.en === l.en)){
+        entry.examples.push({ en:l.en, ar:l.ar });
+      }
+    });
+  });
+  return Array.from(map.values());
+}
+function collectStructurePatternsFromStory(storyId, sceneIds){
+  const story = STORIES[storyId];
+  const lines = [];
+  sceneIds.forEach(sid => {
+    const sc = story.scenes[sid];
+    if(sc && sc.lines) lines.push(...sc.lines);
+  });
+  return collectStructurePatternsFromLines(lines);
+}
+
+/* =====================================================================
+     STRUCTURE EXPLANATION + SCIENTIFIC RECOGNITION QUIZ
+     لوحة شرح احترافية بأمثلة حقيقية من القصة، مع تمرين تعرّف على التركيب
+     (Pattern Recognition) — أسلوب علمي مستخدم في تعليم القواعد.
+     دوال: buildStructurePanel | runStructureQuiz
+     ===================================================================== */
+function buildStructurePanel(patterns, opts){
+  opts = opts || {};
+  const wrap = document.createElement('div');
+  wrap.className = 'struct-panel-wrap';
+  if(!patterns.length) return wrap;
+
+  const toggleBtn = document.createElement('button');
+  toggleBtn.type = 'button';
+  toggleBtn.className = 'struct-panel-btn';
+  toggleBtn.innerHTML = `🧩 ${opts.title || 'تراكيب الجملة في هذا المشهد'} <span class="struct-panel-count">${patterns.length}</span>`;
+  wrap.appendChild(toggleBtn);
+
+  const panel = document.createElement('div');
+  panel.className = 'struct-panel';
+  wrap.appendChild(panel);
+
+  let built = false;
+  toggleBtn.onclick = () => {
+    const nowOpen = panel.classList.toggle('open');
+    toggleBtn.classList.toggle('active', nowOpen);
+    if(nowOpen && !built){ renderExplanations(); built = true; }
+  };
+
+  function renderExplanations(){
+    panel.innerHTML = '';
+    const introEl = document.createElement('div');
+    introEl.className = 'struct-panel-intro';
+    introEl.textContent = opts.intro || 'هذه التراكيب النحوية ظهرت في الجمل التالية — افهمها مع أمثلة حقيقية، ثم اختبر نفسك:';
+    panel.appendChild(introEl);
+
+    patterns.forEach(p => {
+      const c = document.createElement('div');
+      c.className = 'struct-explain-card';
+      const exHtml = p.examples.map(e => `
+        <div class="struct-ex-line">
+          <div class="en" dir="ltr">${e.en}</div>
+          <div class="ar">${e.ar}</div>
+        </div>`).join('');
+      c.innerHTML = `
+        <div class="struct-explain-label">🧩 ${p.label}</div>
+        <div class="struct-explain-text">${p.explain}</div>
+        <div class="struct-examples">${exHtml}</div>
+      `;
+      panel.appendChild(c);
+    });
+
+    const quizWrap = document.createElement('div');
+    quizWrap.className = 'struct-quiz-zone';
+    panel.appendChild(quizWrap);
+
+    const quizBtn = document.createElement('button');
+    quizBtn.type = 'button';
+    quizBtn.className = 'struct-quiz-btn';
+    quizBtn.textContent = '🧪 اختبر نفسك في هذه التراكيب';
+    quizBtn.onclick = () => { quizBtn.remove(); runStructureQuiz(quizWrap, patterns); };
+    panel.appendChild(quizBtn);
+  }
+
+  return wrap;
+}
+
+function runStructureQuiz(container, patterns){
+  const allLabels = SENTENCE_STRUCTURE_PATTERNS.map(p => p.label);
+  const questions = shuffleArray(patterns).slice(0, Math.min(5, patterns.length)).map(p => {
+    const example = p.examples[0];
+    const distractorPool = allLabels.filter(l => l !== p.label);
+    const distractors = shuffleArray(distractorPool).slice(0, 2);
+    const opts = shuffleArray([p.label, ...distractors]);
+    return { example, correctLabel: p.label, opts };
+  });
+  let current = 0;
+  let score = 0;
+
+  function renderQ(){
+    container.innerHTML = '';
+    if(current >= questions.length){
+      const res = document.createElement('div');
+      res.className = 'struct-quiz-result';
+      res.textContent = `✅ أحسنت! أجبت ${score} من ${questions.length} بشكل صحيح.`;
+      container.appendChild(res);
+      return;
+    }
+    const q = questions[current];
+
+    const prog = document.createElement('div');
+    prog.className = 'quiz-progress';
+    prog.textContent = `سؤال ${current + 1} من ${questions.length}`;
+    container.appendChild(prog);
+
+    const qTitle = document.createElement('div');
+    qTitle.className = 'struct-quiz-question';
+    qTitle.textContent = 'ما التركيب النحوي المستخدم في هذه الجملة؟';
+    container.appendChild(qTitle);
+
+    const sentEn = document.createElement('div');
+    sentEn.dir = 'ltr';
+    sentEn.className = 'struct-quiz-sentence-en';
+    sentEn.textContent = q.example.en;
+    container.appendChild(sentEn);
+
+    const sentAr = document.createElement('div');
+    sentAr.className = 'struct-quiz-sentence-ar';
+    sentAr.textContent = q.example.ar;
+    container.appendChild(sentAr);
+
+    const optsDiv = document.createElement('div');
+    optsDiv.className = 'quiz-options';
+    let answered = false;
+    q.opts.forEach(opt => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'quiz-option-btn';
+      btn.textContent = opt;
+      btn.onclick = () => {
+        if(answered) return;
+        answered = true;
+        const correct = opt === q.correctLabel;
+        btn.classList.add(correct ? 'correct' : 'wrong');
+        if(correct) score++;
+        else {
+          optsDiv.querySelectorAll('button').forEach(b => {
+            if(b.textContent === q.correctLabel) b.classList.add('correct');
+          });
+        }
+        setTimeout(() => { current++; renderQ(); }, 900);
+      };
+      optsDiv.appendChild(btn);
+    });
+    container.appendChild(optsDiv);
+  }
+  renderQ();
+}
+
+/* ===== SECTION: 26. عرض المشهد (renderScene — القلب الرئيسي) ===== */
 function renderScene(sceneId){
   window.scrollTo({top:0, behavior:'smooth'});
   const story = STORIES[currentStoryId];
@@ -31172,20 +33147,44 @@ function renderScene(sceneId){
     const textDiv = document.createElement('div');
     textDiv.className = 'text';
     const enP = document.createElement('div');
-    enP.className = 'en';
+    enP.className = 'en en-tappable';
+    enP.title = 'اضغط لترجمة الجملة كاملة — Tap to translate the sentence';
     enP.appendChild(buildWordSpans(l.en));
 
     const arP = document.createElement('div');
     arP.className = 'ar';
     arP.textContent = l.ar;
 
-    translateBtn.onclick = () => {
+    /* تحليل تركيب الجملة تلقائياً — إن وُجد نمط نحوي معروف يُعرض شرحه فوق الترجمة */
+    const structMatches = analyzeSentenceStructure(l.en);
+    let structP = null;
+    if(structMatches.length){
+      structP = document.createElement('div');
+      structP.className = 'sentence-structure';
+      structP.innerHTML = structMatches.map(s => `
+        <div class="struct-item">
+          <span class="struct-label">🧩 ${s.label}</span>
+          <span class="struct-explain">${s.explain}</span>
+        </div>
+      `).join('');
+    }
+
+    const toggleLineTranslation = () => {
       arP.classList.toggle('shown');
+      if(structP) structP.classList.toggle('shown');
       translateBtn.classList.toggle('active');
     };
+    translateBtn.onclick = toggleLineTranslation;
+    /* الضغط في أي مكان من الجملة (عدا كلمة مفردة، التي تفتح نافذة معناها
+       الخاصة) يُترجم الجملة كاملة ويشرح تركيبها فوراً — أكثر طبيعية من زر صغير */
+    enP.addEventListener('click', (e) => {
+      if(e.target.closest('.word')) return;
+      toggleLineTranslation();
+    });
 
     textDiv.appendChild(enP);
     textDiv.appendChild(arP);
+    if(structP) textDiv.appendChild(structP);
 
     topRow.appendChild(controls);
     topRow.appendChild(textDiv);
@@ -31397,9 +33396,24 @@ function renderScene(sceneId){
     };
     card.appendChild(reviewBtn);
     card.appendChild(reviewPanel);
+
+    /* ---- مراجعة شاملة: كل تراكيب الجملة عبر القصة كاملة + تمرين علمي ---- */
+    const storyPatterns = collectStructurePatternsFromStory(currentStoryId, state.historyStack);
+    if(storyPatterns.length){
+      card.appendChild(buildStructurePanel(storyPatterns, {
+        title:'مراجعة تراكيب هذه القصة كاملة',
+        intro:'هذه كل التراكيب النحوية التي ظهرت خلال رحلتك في هذه القصة — راجعها ثم اختبر نفسك فيها جميعاً:'
+      }));
+    }
   } else {
     const hasQuestions = Array.isArray(scene.questions) && scene.questions.length > 0;
     const compPassed = hasQuestions ? isComprehensionPassed(currentStoryId, sceneId) : true;
+
+    /* ---- تراكيب الجملة في هذا المشهد: شرح + أمثلة + تمرين علمي (غير إلزامي) ---- */
+    const scenePatterns = collectStructurePatternsFromLines(scene.lines || []);
+    if(scenePatterns.length){
+      card.appendChild(buildStructurePanel(scenePatterns, { title:'تراكيب الجملة في هذا المشهد' }));
+    }
 
     if(hasQuestions){
       card.appendChild(buildComprehensionCheck(scene, currentStoryId, sceneId, () => renderScene(sceneId)));
@@ -31502,6 +33516,7 @@ const DIAG_CONTRACTIONS = new Set([
   "i'm","it's","that's","there's","he's","she's","we're","they're","you're","i've",
   "i'll","he'll","she'll","we'll","they'll","let's"
 ]);
+/* ===== SECTION: 27. أدوات التشخيص ومختبر الكلمات المتشابهة ===== */
 function diagStemFallback(key){
   const has = base => !!WORD_TRANSLATIONS[base];
   if(/ing$/.test(key)){
