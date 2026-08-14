@@ -117,6 +117,90 @@
   .top-settings-panel .tsp-icon{
     font-size:17px;
   }
+  .top-settings-panel .tsp-divider{
+    height:1px;
+    background:var(--line);
+    margin:4px 2px;
+  }
+  .top-settings-panel .tsp-level-badge{
+    font-family:'Poppins','Inter',sans-serif;
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:.3px;
+    padding:3px 10px;
+    border-radius:999px;
+    background:var(--soft);
+    color:var(--teal);
+    border:1px solid var(--line);
+  }
+  .top-settings-panel .tsp-level-chevron{
+    font-size:10px;
+    opacity:0.55;
+    transition:transform .2s var(--ease);
+  }
+  .top-settings-panel .tsp-level-toggle.open .tsp-level-chevron{
+    transform:rotate(180deg);
+  }
+  .top-settings-panel .tsp-level-list{
+    display:grid;
+    grid-template-rows:0fr;
+    transition:grid-template-rows .25s var(--ease);
+    overflow:hidden;
+  }
+  .top-settings-panel .tsp-level-list.open{
+    grid-template-rows:1fr;
+  }
+  .top-settings-panel .tsp-level-list-inner{
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+    padding-top:3px;
+  }
+  .top-settings-panel .tsp-level-item{
+    display:flex;
+    align-items:center;
+    justify-content:flex-start;
+    gap:9px;
+    padding:8px 10px;
+    border-radius:var(--radius-sm);
+    background:transparent;
+    border:none;
+    width:100%;
+    cursor:pointer;
+    font-family:inherit;
+    text-align:start;
+    transition:background .15s var(--ease);
+  }
+  .top-settings-panel .tsp-level-item:hover,
+  .top-settings-panel .tsp-level-item.active{
+    background:var(--soft);
+  }
+  .top-settings-panel .tsp-level-tag{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-width:38px;
+    padding:3px 8px;
+    border-radius:999px;
+    font-family:'Poppins','Inter',sans-serif;
+    font-size:12px;
+    font-weight:700;
+    flex-shrink:0;
+  }
+  .top-settings-panel .tsp-level-meta{
+    flex:1;
+    font-size:11px;
+    color:var(--ink);
+    opacity:0.65;
+  }
+  .top-settings-panel .tsp-level-check{
+    font-size:13px;
+    color:var(--teal);
+    width:14px;
+    text-align:center;
+    flex-shrink:0;
+  }
   [data-theme="dark"]{
     --cream:#15151F;
     --ink:#ECEBF6;
@@ -213,16 +297,21 @@
     background:var(--card-bg);
     color:var(--ink);
     border:1.5px solid var(--teal);
-    border-radius:50%;
-    width:36px;
+    border-radius:999px;
+    min-width:36px;
     height:36px;
-    font-size:16px;
+    padding:0 10px;
+    font-size:14px;
+    font-family:'Poppins','Inter',sans-serif;
     cursor:pointer;
-    display:flex;
+    display:inline-flex;
     align-items:center;
     justify-content:center;
+    gap:5px;
     box-shadow:0 1px 4px rgba(46,42,94,0.1);
     flex-shrink:0;
+    white-space:nowrap;
+    width:fit-content;
     transition:transform .2s var(--ease), box-shadow .2s var(--ease);
   }
   .back-toggle:hover:not(:disabled){ transform:translateY(-2px); box-shadow:0 4px 12px rgba(46,42,94,0.18); }
@@ -372,6 +461,30 @@
   .font-size-btn:hover{
     background:var(--teal);
     color:#fff;
+  }
+  .word-tap-toggle{
+    display:flex;
+    align-items:center;
+    gap:5px;
+    padding:3px 10px;
+    height:22px;
+    line-height:1;
+    border-radius:14px;
+    border:1px solid var(--line);
+    background:var(--card-bg);
+    color:var(--ink);
+    font-size:11px;
+    font-weight:bold;
+    cursor:pointer;
+    flex-shrink:0;
+    opacity:0.55;
+    transition:all .15s;
+  }
+  .word-tap-toggle.on{
+    opacity:1;
+    background:var(--teal);
+    color:#fff;
+    border-color:var(--teal);
   }
   /* ---- POS COLOR CODING (نظام تلوين حسب نوع الكلمة — 8 فئات متباينة) ----
      الألوان مبنية على أنظمة تلوين نحوية تعليمية شائعة (مثل رموز مونتيسوري
@@ -706,24 +819,6 @@
     cursor:pointer;
     transition:transform .2s var(--ease), box-shadow .2s var(--ease);
   }
-  .home-btn{
-    display:inline-flex;
-    align-items:center;
-    gap:5px;
-    background:transparent;
-    color:var(--teal);
-    border:1px solid var(--line);
-    border-radius:20px;
-    padding:5px 12px;
-    font-size:12px;
-    font-family:'Poppins','Inter',sans-serif;
-    cursor:pointer;
-    margin-top:10px;
-    letter-spacing:0.04em;
-    transition:border-color .15s, background .15s;
-    width:fit-content;
-  }
-  .home-btn:hover{background:var(--soft); border-color:var(--teal);}
   .restart-btn:hover{transform:translateY(-2px); box-shadow:var(--shadow-card-hover);}
   .end-banner{
     font-family:'Poppins','Inter',sans-serif;
@@ -780,17 +875,7 @@
     text-align:center;
     margin-bottom:4px;
   }
-  .level-back-btn{
-    display:inline-block;
-    margin:0 0 12px;
-    padding:8px 16px;
-    border-radius:12px;
-    border:1.5px solid var(--line);
-    background:var(--card-bg);
-    cursor:pointer;
-    font-family:'Poppins','Inter',sans-serif;
-    font-size:14px;
-  }
+
 
   /* ---- LEVEL ACCORDION ---- */
   .levels-wrap{
@@ -915,7 +1000,9 @@
     color:#fff;
   }
   .story-item.tense-hidden{
-    display:none !important;
+    opacity:0;
+    transform:scale(.9);
+    pointer-events:none;
   }
 
   /* ---- PART SUB-SECTIONS (Part 1 / Part 2 inside each level) ---- */
@@ -926,9 +1013,40 @@
     display:flex;
     align-items:center;
     gap:10px;
+    width:100%;
     padding:8px 4px 8px 0;
+    border:none;
     border-bottom:1px dashed var(--line);
-    margin-bottom:12px;
+    margin-bottom:0;
+    background:transparent;
+    cursor:pointer;
+    font:inherit;
+    text-align:left;
+    transition:opacity .2s var(--ease);
+  }
+  .part-header:hover{
+    opacity:0.75;
+  }
+  .part-header-arrow{
+    margin-left:auto;
+    font-size:15px;
+    color:var(--teal);
+    transition:transform .25s var(--ease);
+    flex-shrink:0;
+  }
+  .part-section.open .part-header-arrow{
+    transform:rotate(180deg);
+  }
+  .part-content{
+    max-height:0;
+    overflow:hidden;
+    transition:max-height .3s ease;
+  }
+  .part-section.open .part-content{
+    max-height:6000px;
+  }
+  .part-content .story-grid{
+    margin-top:12px;
   }
   .part-badge{
     font-family:'Poppins','Inter',sans-serif;
@@ -1086,7 +1204,7 @@
     border-radius:var(--radius-md);
     padding:0;
     cursor:pointer;
-    transition:transform .25s var(--ease), box-shadow .25s var(--ease), border-color .25s var(--ease);
+    transition:transform .25s var(--ease), box-shadow .25s var(--ease), border-color .25s var(--ease), opacity .32s var(--ease);
     position:relative;
     box-shadow:var(--shadow-card);
     display:flex;
@@ -1100,6 +1218,31 @@
   }
   .story-item.completed{
     opacity:0.85;
+  }
+  /* ---- CURRENT STORY (نقطة استئناف المتعلم — يفتح النظام عندها تلقائياً) ---- */
+  .story-item.current-story{
+    border-color:var(--teal);
+    box-shadow:0 0 0 2px var(--teal), var(--shadow-card);
+  }
+  .story-item.current-story-pulse{
+    animation:currentStoryPulse 1.4s var(--ease) 2;
+  }
+  @keyframes currentStoryPulse{
+    0%,100%{ box-shadow:0 0 0 2px var(--teal), var(--shadow-card); }
+    50%{ box-shadow:0 0 0 6px rgba(20,184,166,0.25), var(--shadow-card-hover); }
+  }
+  .story-current-badge{
+    display:flex;
+    align-items:center;
+    gap:5px;
+    background:var(--teal);
+    color:#fff;
+    font-family:'Poppins','Inter',sans-serif;
+    font-size:11px;
+    font-weight:800;
+    letter-spacing:0.03em;
+    padding:7px 16px;
+    line-height:1.3;
   }
   /* Sandbox Mode: القصص المقفلة تسلسلياً — تظهر باهتة وبمؤشر ممنوع بدل
      الاختفاء الكامل، حتى يعرف المستخدم أنها موجودة وكيف يفتحها */
@@ -1639,6 +1782,8 @@
   .quiz-opt:hover{background:var(--card-bg); border-color:var(--teal);}
   .quiz-opt.correct{background:#d4f5e2; border-color:#2a9d5c; color:#1a5c35;}
   .quiz-opt.wrong{background:#fde8e8; border-color:#e05050; color:#7a1a1a;}
+  [data-theme="dark"] .quiz-opt.correct{background:#1b3a2a; border-color:#2a9d5c; color:#5cd97a;}
+  [data-theme="dark"] .quiz-opt.wrong{background:#3a1f1f; border-color:#e05050; color:#ff8a8a;}
   .quiz-result{
     text-align:center;
     padding:16px 0 8px;
@@ -1754,6 +1899,8 @@
   }
   .fc-know-btn{ background:#d4f5e2; color:#1a5c35; }
   .fc-dontknow-btn{ background:#fde8e8; color:#7a1a1a; }
+  [data-theme="dark"] .fc-know-btn{ background:#1b3a2a; color:#5cd97a; }
+  [data-theme="dark"] .fc-dontknow-btn{ background:#3a1f1f; color:#ff8a8a; }
   .fc-empty{
     font-family:Tahoma,sans-serif;
     direction:rtl;
@@ -2297,6 +2444,13 @@
   .dict-box.correct{border-color:#2a9d5c; background:#d4f5e2; color:#1a5c35;}
   .dict-box.wrong{border-color:#e05050; background:#fde8e8; color:#7a1a1a;}
   .dict-box.hinted{border-color:#e6a800; background:#fff3cd; color:#7a5c00;}
+  [data-theme="dark"] .dict-box.correct{background:#1b3a2a; color:#5cd97a;}
+  [data-theme="dark"] .dict-box.wrong{background:#3a1f1f; color:#ff8a8a;}
+  [data-theme="dark"] .dict-box.hinted{background:#3a3320; color:#f0cf6a;}
+  .quiz-feedback-ok{color:#1a5c35;}
+  .quiz-feedback-bad{color:#7a1a1a;}
+  [data-theme="dark"] .quiz-feedback-ok{color:#5cd97a;}
+  [data-theme="dark"] .quiz-feedback-bad{color:#ff8a8a;}
   .dict-box-space{
     width:14px;
     height:42px;
@@ -2724,6 +2878,7 @@
     transition:background .12s;
   }
   .hw-item-remove:hover{background:#fde8e8;}
+  [data-theme="dark"] .hw-item-remove:hover{background:#3a1f1f;}
   .hw-speak-btn{
     background:none;
     border:none;
@@ -5805,6 +5960,14 @@
             "ar": "ينظر في المرآة. وجهه أبيض. يبدو متعباً جداً."
           },
           {
+            "en": "His head hurts so much that he wants to cry.",
+            "ar": "رأسه يؤلمه كثيراً لدرجة أنه يريد أن يبكي."
+          },
+          {
+            "en": "He does not feel like he can bounce out of bed or fly through his morning like usual.",
+            "ar": "لا يشعر أنه قادر على النهوض بنشاط من السرير أو الانطلاق في صباحه كالمعتاد."
+          },
+          {
             "en": "His mother comes in. \"Sam! You look pale. What is wrong?\" she asks.",
             "ar": "تدخل أمه. «سام! تبدو شاحباً. ما الأمر؟» تسأل."
           }
@@ -5881,6 +6044,10 @@
           {
             "en": "\"The doctor will know what to do,\" she says. Sam tries to stand up, but he sits back down.",
             "ar": "تقول: «الطبيب سيعرف ماذا يفعل.» يحاول سام أن يقف، لكنه يجلس مرة أخرى."
+          },
+          {
+            "en": "He is about to fall, so his mother helps carry his bag for him.",
+            "ar": "يكاد يسقط، فتساعد أمه في حمل حقيبته عنه."
           }
         ],
         "choices": [
@@ -5936,6 +6103,10 @@
           {
             "en": "Sam moves his neck and his back. \"Maybe I am just tired,\" he says.",
             "ar": "يحرك سام رقبته وظهره. يقول: «ربما أنا فقط متعب.»"
+          },
+          {
+            "en": "Sometimes his back hurts a little, but today it hurts badly.",
+            "ar": "أحياناً يؤلمه ظهره قليلاً، لكن اليوم يؤلمه بشدة."
           },
           {
             "en": "His mother asks, \"Where is the pain?\" \"My back and my tooth,\" he says.",
@@ -6005,12 +6176,20 @@
             "ar": "في المستشفى تسأل الممرضة: «منذ متى أنت مريض؟» يقول سام: «منذ هذا الصباح.»"
           },
           {
+            "en": "\"When did it start? Was it like this yesterday too?\" the nurse asks.",
+            "ar": "تسأل الممرضة: «متى بدأ الأمر؟ هل كان هكذا بالأمس أيضاً؟»"
+          },
+          {
             "en": "\"Open your mouth please.\" She looks at his eyes, ears, nose, and mouth.",
             "ar": "تقول: «افتح فمك من فضلك.» تنظر إلى عينيه وأذنيه وأنفه وفمه."
           },
           {
             "en": "\"You are not very sick. Just rest,\" she says.",
             "ar": "تقول: «لست مريضاً كثيراً. فقط استرح.»"
+          },
+          {
+            "en": "\"By tomorrow morning, you will feel much better,\" she adds.",
+            "ar": "تضيف: «بحلول صباح الغد، ستشعر بتحسن كبير.»"
           },
           {
             "en": "The nurse gives him some water. \"Try to sleep well tonight,\" she says.",
@@ -6077,6 +6256,10 @@
           {
             "en": "\"I know a good medicine for you,\" the man says. He shows Sam a small box.",
             "ar": "يقول الرجل: «أعرف دواءً جيداً لك.» يريه سام علبة صغيرة."
+          },
+          {
+            "en": "\"Take only these small pills, twice a day,\" the man explains.",
+            "ar": "يشرح الرجل: «تناول فقط هذه الحبات الصغيرة، مرتين يومياً.»"
           }
         ],
         "choices": [
@@ -6178,6 +6361,14 @@
           {
             "en": "He stands tall, with his shoulders, chest, and back straight.",
             "ar": "يقف طويلاً، مع كتفيه، صدره، وظهره مستقيمين."
+          },
+          {
+            "en": "Feeling strong does not mean he can run fast today, he thinks.",
+            "ar": "يفكر أن الشعور بالقوة لا يعني أنه يستطيع الركض بسرعة اليوم."
+          },
+          {
+            "en": "He looks round the room, and his mother is so happy she wants to clap.",
+            "ar": "ينظر حوله في الغرفة، وأمه سعيدة جداً لدرجة أنها تريد أن تصفق."
           }
         ],
         "choices": [
@@ -6235,6 +6426,10 @@
           {
             "en": "He is happy. His mother is a good helper. He loves her.",
             "ar": "هو سعيد. أمه مساعدة جيدة. هو يحبها."
+          },
+          {
+            "en": "Between two soft pillows, Sam falls asleep as his mother starts to sing a quiet song.",
+            "ar": "بين وسادتين ناعمتين، ينام سام بينما تبدأ أمه بالغناء بأغنية هادئة."
           }
         ]
       },
@@ -6265,6 +6460,14 @@
           {
             "en": "\"Your tooth is good now,\" the dentist says. Sam smiles a big smile.",
             "ar": "يقول الطبيب: «سنك جيد الآن.» يبتسم سام ابتسامة كبيرة."
+          },
+          {
+            "en": "\"The problem was just below the surface,\" the dentist explains.",
+            "ar": "يشرح الطبيب: «كانت المشكلة تحت السطح مباشرة.»"
+          },
+          {
+            "en": "The dentist shows Sam a short video about how to brush well, and says he can now travel and even play in the snow without worry.",
+            "ar": "يريه الطبيب فيديو قصيراً عن كيفية تنظيف الأسنان جيداً، ويقول إنه يستطيع الآن السفر وحتى اللعب في الثلج دون قلق."
           }
         ]
       },
@@ -6684,6 +6887,14 @@
           {
             "en": "The man points to a small red chair. \"Do you like the colour?\" he asks.",
             "ar": "يشير الرجل إلى كرسي أحمر صغير. يسأل: «هل يعجبك اللون؟»"
+          },
+          {
+            "en": "Maya wants to change her mind and buy a small plant too.",
+            "ar": "تريد مايا أن تغيّر رأيها وتشتري نبتة صغيرة أيضاً."
+          },
+          {
+            "en": "She plans to cook a nice dinner tonight, and decides to send her mother a photo of the new furniture.",
+            "ar": "تخطط لطهي عشاء لطيف الليلة، وتقرر أن ترسل لأمها صورة للأثاث الجديد."
           }
         ],
         "choices": [
@@ -6825,6 +7036,10 @@
           {
             "en": "\"This is a good place to live!\" she says with a big smile.",
             "ar": "تقول بابتسامة كبيرة: «هذا مكان جيد للعيش!»"
+          },
+          {
+            "en": "Maya already starts to dream about the happy days she will enjoy here.",
+            "ar": "تبدأ مايا مسبقاً بالحلم بالأيام السعيدة التي ستستمتع بها هنا."
           }
         ],
         "choices": [
@@ -6903,6 +7118,10 @@
           {
             "en": "She hums and dances a little as she paints one wall a soft yellow.",
             "ar": "تدندن وترقص قليلاً وهي تطلي جداراً واحداً باللون الأصفر الفاتح."
+          },
+          {
+            "en": "She wants to take a photo of the yellow wall and text it to her mother.",
+            "ar": "تريد أن تلتقط صورة للجدار الأصفر وترسلها برسالة نصية إلى أمها."
           }
         ],
         "choices": [
@@ -8460,6 +8679,10 @@
             "ar": "يفتح صندوق أدواته. بداخله يجد شريط قياس ومشبكاً وكماشة."
           },
           {
+            "en": "He wants to build a new gate too, using pieces of old wood.",
+            "ar": "يريد أيضاً أن يبني باباً جديداً، مستخدماً قطعاً من الخشب القديم."
+          },
+          {
             "en": "Then his phone rings. It is his friend Noor. \"Ali! The park is beautiful today. Do you want to come?\" she asks.",
             "ar": "ثم يرن هاتفه. إنها صديقته نور. تسأل: «علي! الحديقة العامة جميلة اليوم. هل تريد المجيء؟»"
           },
@@ -8698,6 +8921,10 @@
             "ar": "يعير سام علياً شوكته. معاً، يجعلان التربة ناعمة في دقائق قليلة — أسرع بكثير مما توقع علي."
           },
           {
+            "en": "\"Your flowers will grow much better in soil like this,\" Sam says.",
+            "ar": "يقول سام: «زهورك ستنمو بشكل أفضل بكثير في تربة كهذه.»"
+          },
+          {
             "en": "\"Thank you, Sam!\" Ali says, checking his phone again. Noor is still waiting.",
             "ar": "يقول علي: «شكراً يا سام!» ويتحقق من هاتفه مرة أخرى. لا تزال نور تنتظر."
           }
@@ -8831,6 +9058,10 @@
           {
             "en": "They see ducks near the lake. \"Let's feed them,\" Noor says.",
             "ar": "يريان بطاً قرب البحيرة. تقول نور: «لنطعمهم.»"
+          },
+          {
+            "en": "Some ducks swim close to the edge, hoping for bread.",
+            "ar": "يسبح بعض البط قريباً من الحافة، على أمل الحصول على خبز."
           }
         ],
         "choices": [
@@ -8894,6 +9125,14 @@
           {
             "en": "Some children ride their bikes and skip along the path.",
             "ar": "يركب بعض الأطفال دراجاتهم ويقفزون على طول الممر."
+          },
+          {
+            "en": "One small boy likes to hide behind a tree while his friends look for him.",
+            "ar": "يحب صبي صغير أن يختبئ خلف شجرة بينما يبحث عنه أصدقاؤه."
+          },
+          {
+            "en": "Near the water, some older boys sail small paper boats — those boats move slow across the lake.",
+            "ar": "قرب الماء، يُبحر بعض الصبية الأكبر سناً قوارب ورقية صغيرة — تلك القوارب تتحرك ببطء عبر البحيرة."
           },
           {
             "en": "Then the sky becomes dark. It starts to rain! \"Oh no!\" Noor says. \"Run!\" Ali says.",
@@ -8972,6 +9211,10 @@
           {
             "en": "Noor teaches Ali a small card game while they wait for the rain to stop.",
             "ar": "تعلّم نور علياً لعبة ورق صغيرة بينما ينتظران توقف المطر."
+          },
+          {
+            "en": "When Ali wins, he wants to shout happily, and Noor laughs at him.",
+            "ar": "عندما يفوز علي، يريد أن يصرخ بسعادة، وتضحك نور منه."
           },
           {
             "en": "They laugh. \"This is a good day,\" Ali says. \"Yes — a busy one, but a good one,\" Noor says.",
@@ -11940,7 +12183,7 @@
               "To the kitchen",
               "To her bedroom, at her desk",
               "To the garden",
-              "To a café"
+              "To a cafe"
             ],
             "correct": 1
           },
@@ -15091,7 +15334,7 @@
             "options": [
               "A gift shop",
               "A presentation about the century of exploration",
-              "A café",
+              "A cafe",
               "A garden"
             ],
             "correct": 1
@@ -17023,6 +17266,10 @@
           {
             "en": "She counts her books twice to make sure nothing is missing.",
             "ar": "تعدّ كتبها مرتين للتأكد من عدم نقصان شيء."
+          },
+          {
+            "en": "She wants to add a red pen to her pencil case.",
+            "ar": "تريد أن تضيف قلماً أحمر إلى مقلمتها."
           }
         ],
         "choices": [
@@ -17159,6 +17406,10 @@
             "ar": "يمشيان معاً. يسأل عمر: «أي مادة تفضلين؟»"
           },
           {
+            "en": "Omar starts to bring out his timetable and walks just behind her.",
+            "ar": "يبدأ عمر بإخراج جدوله ويمشي خلفها مباشرة."
+          },
+          {
             "en": "\"Maths,\" Huda says. \"I like chemistry more,\" Omar laughs.",
             "ar": "تقول هدى: «الرياضيات.» يضحك عمر: «أنا أفضل الكيمياء أكثر.»"
           }
@@ -17211,6 +17462,10 @@
           {
             "en": "The playground is full of pupils. Some play a ball game, others just talk.",
             "ar": "الملعب مليء بالتلاميذ. بعضهم يلعب لعبة بالكرة، وآخرون يتحدثون فقط."
+          },
+          {
+            "en": "Huda has to cross the playground to find Omar.",
+            "ar": "على هدى أن تعبر الملعب لتجد عمر."
           },
           {
             "en": "Omar finds Huda. \"Do you have physics next?\" he asks, looking at his timetable.",
@@ -17352,6 +17607,14 @@
           {
             "en": "The next day, the teacher gives back the tests. \"Excellent mark, Huda,\" she says.",
             "ar": "في اليوم التالي، تعيد المعلمة الاختبارات. تقول: «علامة ممتازة يا هدى.»"
+          },
+          {
+            "en": "Huda wonders who else got a good mark, and asks the teacher why her answer about the river was correct.",
+            "ar": "تتساءل هدى من حصل أيضاً على علامة جيدة، وتسأل المعلمة لماذا كانت إجابتها عن النهر صحيحة."
+          },
+          {
+            "en": "The teacher says she will email her parents, and asks Huda to spell the word \"river\" out loud.",
+            "ar": "تقول المعلمة إنها سترسل بريداً إلكترونياً لوالديها، وتطلب من هدى أن تتهجى كلمة «نهر» بصوت عالٍ."
           }
         ],
         "choices": [
@@ -18340,6 +18603,10 @@
             "ar": "يركل زيد الكرة بقوة نحو المرمى."
           },
           {
+            "en": "He tries to hit the ball again, but this time it goes off target.",
+            "ar": "يحاول أن يضرب الكرة مرة أخرى، لكنها تخرج عن الهدف هذه المرة."
+          },
+          {
             "en": "Zaid scores a goal in practice. He feels proud, but a little lonely without Tamer.",
             "ar": "يسجل زيد هدفاً في التدريب. يشعر بالفخر، لكنه وحيد قليلاً بدون تامر."
           },
@@ -18409,6 +18676,10 @@
           {
             "en": "He throws the ball to Tamer, who jumps to catch it.",
             "ar": "يرمي الكرة إلى تامر، الذي يقفز ليمسكها."
+          },
+          {
+            "en": "Zaid tries to be quick, but he starts to lose the ball most of the time.",
+            "ar": "يحاول زيد أن يكون سريعاً، لكنه يبدأ بفقدان الكرة معظم الوقت."
           },
           {
             "en": "\"Are you enjoying this?\" Tamer asks, noticing his friend's quiet face.",
@@ -18534,6 +18805,14 @@
           {
             "en": "The team practises every day. Zaid learns to pass, run, and think fast.",
             "ar": "يتدرب الفريق كل يوم. يتعلم زيد التمرير والركض والتفكير بسرعة."
+          },
+          {
+            "en": "Marwan says he has never played so well in any match before.",
+            "ar": "يقول مروان إنه لم يلعب بهذا الشكل الجيد في أي مباراة من قبل."
+          },
+          {
+            "en": "Before the match, Zaid's father offers to drive the team, and the players climb into the van, ready to hop and skate around during warm-up.",
+            "ar": "قبل المباراة، يعرض والد زيد أن يقود الفريق، ويصعد اللاعبون إلى السيارة، مستعدين للقفز والتزحلق أثناء الإحماء."
           },
           {
             "en": "On the day of the match, Tamer surprises him — he comes to watch, wearing football colours!",
@@ -19815,9 +20094,249 @@
         ]
       }
     }
+  },
+  "ramy_deadline": {
+    "level": "B1",
+    "title": "The Project Deadline",
+    "title_ar": "الموعد النهائي للمشروع",
+    "icon": "⏰",
+    "desc": "Ramy tends to procrastinate. When a big deadline arrives, he must learn to prioritize, coordinate, and increase his performance.",
+    "desc_ar": "يميل رامي إلى المماطلة. عندما يقترب موعد نهائي كبير، عليه أن يتعلم ترتيب الأولويات والتنسيق وزيادة أدائه.",
+    "scenes": {
+      "start": {
+        "lines": [
+          {
+            "en": "Ramy tends to procrastinate. He always leaves his work until the last moment.",
+            "ar": "يميل رامي إلى المماطلة. يترك عمله دائماً حتى اللحظة الأخيرة."
+          },
+          {
+            "en": "Today, his manager reminds him: \"The project deadline is tomorrow morning.\"",
+            "ar": "اليوم يذكّره مديره: «الموعد النهائي للمشروع صباح الغد.»"
+          },
+          {
+            "en": "Ramy looks at his messy desk and ten unfinished tasks. He suddenly feels overwhelmed.",
+            "ar": "ينظر رامي إلى مكتبه الفوضوي ومهامه العشر غير المكتملة. يشعر فجأة بأنه مرهق."
+          },
+          {
+            "en": "\"I need a plan,\" he thinks. \"Where do I even start?\"",
+            "ar": "يفكر: «أحتاج إلى خطة. من أين أبدأ حتى؟»"
+          }
+        ],
+        "choices": [
+          {
+            "en": "Make a list and prioritize the most necessary tasks",
+            "ar": "اعمل قائمة ورتّب أولويات المهام الضرورية",
+            "next": "prioritize_path"
+          },
+          {
+            "en": "Call a teammate to coordinate the work together",
+            "ar": "اتصل بزميل لتنسيق العمل معاً",
+            "next": "coordinate_path"
+          }
+        ],
+        "questions": [
+          {
+            "en": "What does Ramy tend to do with his work?",
+            "ar": "ماذا يميل رامي إلى فعله بعمله؟",
+            "options": [
+              "Finish it early",
+              "Procrastinate until the last moment",
+              "Give it to someone else",
+              "Ignore it completely"
+            ],
+            "correct": 1
+          },
+          {
+            "en": "When is the project deadline?",
+            "ar": "متى الموعد النهائي للمشروع؟",
+            "options": [
+              "Next week",
+              "Tomorrow morning",
+              "In one hour",
+              "Next month"
+            ],
+            "correct": 1
+          },
+          {
+            "en": "How does Ramy feel when he sees his unfinished tasks?",
+            "ar": "كيف يشعر رامي عندما يرى مهامه غير المكتملة؟",
+            "options": [
+              "Relaxed",
+              "Bored",
+              "Overwhelmed",
+              "Happy"
+            ],
+            "correct": 2
+          }
+        ]
+      },
+      "prioritize_path": {
+        "lines": [
+          {
+            "en": "Ramy decides to prioritize. He writes down every task and marks the necessary ones first.",
+            "ar": "يقرر رامي ترتيب الأولويات. يكتب كل مهمة ويحدد المهام الضرورية أولاً."
+          },
+          {
+            "en": "\"My top priority is the client report,\" he says, circling it in red.",
+            "ar": "يقول: «أولويتي الأولى هي تقرير العميل،» ويحيطها بدائرة حمراء."
+          },
+          {
+            "en": "He works quickly, and his efficiency increases with every finished task.",
+            "ar": "يعمل بسرعة، وتزداد كفاءته مع كل مهمة ينجزها."
+          },
+          {
+            "en": "By evening, the three most necessary tasks are done.",
+            "ar": "بحلول المساء، تكتمل أهم ثلاث مهام ضرورية."
+          }
+        ],
+        "choices": [
+          {
+            "en": "Keep working alone until the deadline",
+            "ar": "استمر في العمل وحدك حتى الموعد النهائي",
+            "next": "end_prioritized"
+          }
+        ],
+        "questions": [
+          {
+            "en": "What does Ramy write down first?",
+            "ar": "ماذا يكتب رامي أولاً؟",
+            "options": [
+              "A shopping list",
+              "Every task, marking the necessary ones",
+              "A letter to his manager",
+              "Nothing"
+            ],
+            "correct": 1
+          },
+          {
+            "en": "What is Ramy's top priority?",
+            "ar": "ما أولوية رامي الأولى؟",
+            "options": [
+              "Cleaning his desk",
+              "The client report",
+              "A coffee break",
+              "A phone call"
+            ],
+            "correct": 1
+          },
+          {
+            "en": "What happens to Ramy's efficiency as he works?",
+            "ar": "ماذا يحدث لكفاءة رامي وهو يعمل؟",
+            "options": [
+              "It decreases",
+              "It increases",
+              "It stays the same",
+              "It disappears"
+            ],
+            "correct": 1
+          }
+        ]
+      },
+      "coordinate_path": {
+        "lines": [
+          {
+            "en": "Ramy calls his colleague Huda. \"Can we coordinate our work today?\" he asks.",
+            "ar": "يتصل رامي بزميلته هدى. يسأل: «هل يمكننا تنسيق عملنا اليوم؟»"
+          },
+          {
+            "en": "Huda agrees, and together they divide the necessary tasks between them.",
+            "ar": "توافق هدى، ويقسمان معاً المهام الضرورية بينهما."
+          },
+          {
+            "en": "With good coordination, their performance improves quickly.",
+            "ar": "بتنسيق جيد، يتحسن أداؤهما بسرعة."
+          },
+          {
+            "en": "\"Two people finish faster than one,\" Huda says with a smile.",
+            "ar": "تقول هدى مبتسمة: «شخصان ينجزان أسرع من واحد.»"
+          }
+        ],
+        "choices": [
+          {
+            "en": "Finish the project together",
+            "ar": "أنهيا المشروع معاً",
+            "next": "end_coordinated"
+          }
+        ],
+        "questions": [
+          {
+            "en": "Who does Ramy call for help?",
+            "ar": "بمن يتصل رامي طلباً للمساعدة؟",
+            "options": [
+              "His manager",
+              "His colleague Huda",
+              "A stranger",
+              "His brother"
+            ],
+            "correct": 1
+          },
+          {
+            "en": "What do Ramy and Huda do with the necessary tasks?",
+            "ar": "ماذا يفعل رامي وهدى بالمهام الضرورية؟",
+            "options": [
+              "Ignore them",
+              "Divide them between them",
+              "Give them to someone else",
+              "Postpone them"
+            ],
+            "correct": 1
+          },
+          {
+            "en": "What improves with good coordination, according to the story?",
+            "ar": "ماذا يتحسن بالتنسيق الجيد بحسب القصة؟",
+            "options": [
+              "Their performance",
+              "The weather",
+              "The office furniture",
+              "Nothing"
+            ],
+            "correct": 0
+          }
+        ]
+      },
+      "end_prioritized": {
+        "ending": true,
+        "title": "Ending: Priorities First",
+        "title_ar": "النهاية: الأولويات أولاً",
+        "lines": [
+          {
+            "en": "Ramy submits his part of the project exactly on time.",
+            "ar": "يسلّم رامي جزءه من المشروع في الوقت تماماً."
+          },
+          {
+            "en": "His manager notices the increased performance. \"Great work today,\" she says.",
+            "ar": "يلاحظ مديره الأداء المتزايد. تقول: «عمل رائع اليوم.»"
+          },
+          {
+            "en": "Ramy smiles. \"Next time, I won't procrastinate until the last moment,\" he tells himself.",
+            "ar": "يبتسم رامي ويقول لنفسه: «في المرة القادمة، لن أماطل حتى اللحظة الأخيرة.»"
+          }
+        ]
+      },
+      "end_coordinated": {
+        "ending": true,
+        "title": "Ending: Better Together",
+        "title_ar": "النهاية: أفضل معاً",
+        "lines": [
+          {
+            "en": "Ramy and Huda finish the project together, one hour before the deadline.",
+            "ar": "ينهي رامي وهدى المشروع معاً، قبل ساعة من الموعد النهائي."
+          },
+          {
+            "en": "\"Good coordination made this so much easier,\" Ramy says.",
+            "ar": "يقول رامي: «التنسيق الجيد جعل هذا أسهل بكثير.»"
+          },
+          {
+            "en": "Their manager is impressed by their teamwork and increased efficiency.",
+            "ar": "يُعجب مديرهما بعملهما الجماعي وكفاءتهما المتزايدة."
+          }
+        ]
+      }
+    }
   }
 }
 </script>
+
 <!-- ===== SECTION: Translations Dictionary ===== -->
 <!-- =====================================================================
      TRANSLATIONS DICTIONARY  (id="translations-data")
@@ -23379,15 +23898,245 @@
   "testing": "اختبار",
   "that's": "ذلك هو",
   "trains": "يتدرب / قطارات",
+  "procrastinate": "يماطل / يؤجل",
+  "tend": "يميل (إلى)",
+  "tends": "يميل (إلى)",
+  "overwhelmed": "مرهق / غامر",
+  "prioritize": "يرتب حسب الأولوية",
+  "efficiency": "كفاءة",
+  "coordinate": "ينسّق",
+  "coordination": "تنسيق",
+  "increased": "متزايد / ازداد",
   "typed": "كتب (على لوحة المفاتيح)",
   "windows": "نوافذ",
   "woman's": "خاصة المرأة",
   "won't": "لن",
-  "year's": "خاصة السنة"
+  "year's": "خاصة السنة",
+  "quit": "يستقيل / يتوقف عن",
+  "ignore": "يتجاهل",
+  "forgot": "نسي",
+  "sleepy": "نعسان",
+  "ignores": "يتجاهل",
+  "rope": "حبل",
+  "besides": "إلى جانب ذلك",
+  "advise": "ينصح",
+  "expectation": "توقع",
+  "bench": "مقعد",
+  "shovel": "مجرفة",
+  "string": "خيط",
+  "broke": "كسر",
+  "expectations": "توقعات",
+  "tires": "إطارات / يُتعب",
+  "cereal": "حبوب الإفطار",
+  "windy": "عاصف",
+  "mall": "مركز تجاري",
+  "snowy": "مثلج",
+  "whisper": "يهمس",
+  "rug": "سجادة",
+  "wallet": "محفظة",
+  "oversleeping": "الإفراط في النوم",
+  "reschedule": "يعيد جدولة",
+  "logo": "شعار",
+  "reject": "يرفض",
+  "ducks": "بط",
+  "entrance": "مدخل",
+  "remind": "يذكّر",
+  "crooked": "معوج",
+  "qualified": "مؤهل",
+  "delete": "يحذف",
+  "france": "فرنسا",
+  "spain": "إسبانيا",
+  "germany": "ألمانيا",
+  "applaud": "يصفق",
+  "distracts": "يشتت الانتباه",
+  "messy": "فوضوي",
+  "injured": "مصاب",
+  "upset": "منزعج",
+  "battery": "بطارية",
+  "divide": "يقسم",
+  "destination": "وجهة",
+  "camels": "جِمال",
+  "tunnel": "نفق",
+  "cloudy": "غائم",
+  "airplane": "طائرة",
+  "outage": "انقطاع",
+  "dilemma": "معضلة",
+  "foggy": "ضبابي",
+  "upgrade": "ترقية / يُطوّر",
+  "shopkeeper": "صاحب متجر",
+  "permanent": "دائم",
+  "hires": "يوظّف",
+  "sunnier": "أكثر إشراقاً",
+  "dust": "غبار",
+  "bounce": "يرتد",
+  "pills": "حبوب دواء",
+  "fever": "حمى",
+  "bent": "معوج",
+  "lying": "مستلقٍ",
+  "mosque": "مسجد",
+  "hums": "يدندن",
+  "paris": "باريس",
+  "interrupts": "يقاطع",
+  "instantly": "فوراً",
+  "praise": "يمدح",
+  "redesign": "يعيد تصميم",
+  "those": "أولئك",
+  "forever": "إلى الأبد",
+  "helmet": "خوذة",
+  "specifically": "تحديداً",
+  "width": "عرض",
+  "bucket": "دلو",
+  "album": "ألبوم",
+  "rusty": "صدئ",
+  "upside": "معكوس",
+  "shallow": "ضحل",
+  "wobbly": "غير ثابت",
+  "sticky": "لزج",
+  "apart": "منفصل",
+  "rejection": "رفض",
+  "invoice": "فاتورة",
+  "junior": "مبتدئ",
+  "indifferent": "غير مبالٍ",
+  "resignation": "استقالة",
+  "related": "متعلق بـ",
+  "comfort": "راحة",
+  "ease": "سهولة",
+  "promoted": "تمت ترقيته",
+  "represented": "تم تمثيله",
+  "angrily": "بغضب",
+  "remaining": "المتبقي",
+  "total": "إجمالي",
+  "warning": "تحذير",
+  "documentaries": "أفلام وثائقية",
+  "documentary": "فيلم وثائقي",
+  "broom": "مكنسة",
+  "unsure": "غير متأكد",
+  "rode": "ركب",
+  "failure": "فشل",
+  "grades": "درجات",
+  "recommendation": "توصية",
+  "license": "رخصة",
+  "nonexistent": "غير موجود",
+  "unclear": "غير واضح",
+  "relevant": "ذو صلة",
+  "volunteers": "متطوعون",
+  "unclearly": "بشكل غير واضح",
+  "sweaty": "متعرق",
+  "violently": "بعنف",
+  "dishonest": "غير صادق",
+  "confusing": "محيّر",
+  "unreliable": "غير موثوق",
+  "flags": "أعلام",
+  "italy": "إيطاليا",
+  "politician": "سياسي",
+  "skyline": "أفق المدينة",
+  "disorganized": "غير منظم",
+  "sunglasses": "نظارة شمسية",
+  "beauty": "جمال",
+  "disappointing": "مخيّب للآمال",
+  "session": "جلسة",
+  "picnic": "نزهة",
+  "ingredients": "مكونات",
+  "makeup": "مكياج",
+  "sunscreen": "واقي شمس",
+  "trimmer": "آلة تشذيب",
+  "rabbit": "أرنب",
+  "coin": "عملة معدنية",
+  "retired": "متقاعد",
+  "treadmill": "جهاز مشي رياضي",
+  "diagnose": "يشخّص",
+  "swam": "سبح",
+  "sprained": "ملتوٍ",
+  "self-checkout": "دفع ذاتي",
+  "scan": "يفحص",
+  "warn": "يحذّر",
+  "difficulty": "صعوبة",
+  "kicks": "يركل",
+  "absent": "غائب",
+  "hop": "يقفز",
+  "skate": "يتزلج",
+  "warm-up": "إحماء",
+  "quits": "يستقيل",
+  "forces": "يجبر",
+  "dislikes": "لا يحب",
+  "announce": "يعلن",
+  "contest": "مسابقة",
+  "bothered": "أزعج",
+  "poem": "قصيدة",
+  "random": "عشوائي",
+  "caption": "تعليق على صورة",
+  "deletes": "يحذف",
+  "feast": "وليمة",
+  "sunburnt": "محروق من الشمس",
+  "infection": "عدوى",
+  "tire": "إطار / يُتعب",
+  "fuel": "وقود",
+  "annoyed": "منزعج",
+  "plenty": "الكثير",
+  "mess": "فوضى",
+  "teammate": "زميل فريق",
+  "decreases": "يقل",
+  "postpone": "يؤجل",
+  "loan": "قرض"
 }
 </script>
 <!-- ===== SECTION: JavaScript Logic ===== -->
 <script>
+/* =====================================================================
+     UNIFIED BACK BUTTON (زر العودة الموحّد — المصدر الوحيد لكل الملف)
+     دالة واحدة تبني زر "↩" بنفس الشكل والسلوك في كل شاشات التطبيق،
+     بدل تكرار document.createElement('button') يدوياً في كل مكان.
+     الوجهة (onClick) تبقى خاصة بكل شاشة كما كانت — لا تغيير وظيفي.
+     دوال: createBackToggle
+     ===================================================================== */
+function createBackToggle(onClick, opts){
+  opts = opts || {};
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = opts.className || ('back-toggle' + (opts.extraClass ? ' ' + opts.extraClass : ''));
+  if(opts.html) btn.innerHTML = opts.html;
+  else btn.textContent = opts.label || '↩';
+  if(opts.title) btn.title = opts.title;
+  if(opts.ariaLabel) btn.setAttribute('aria-label', opts.ariaLabel);
+  if(opts.style) btn.style.cssText = opts.style;
+  btn.onclick = onClick;
+  return btn;
+}
+function wrapBackToggle(btn){
+  const wrap = document.createElement('div');
+  wrap.className = 'card-top-bar-right';
+  wrap.appendChild(btn);
+  return wrap;
+}
+
+/* =====================================================================
+     WORD TAP PREFERENCES (تفضيل الضغط على الكلمة)
+     يتحكم فيما يحدث عند الضغط على كلمة داخل القصة:
+     صوت فقط | معنى فقط | كلاهما | كلاهما متوقف.
+     مخزّن في localStorage فيبقى محفوظاً بين الجلسات.
+     دوال: toggleWordTapSound | toggleWordTapMeaning
+     ===================================================================== */
+const WORD_TAP_SOUND_KEY = 'wordTapSoundEnabled';
+const WORD_TAP_MEANING_KEY = 'wordTapMeaningEnabled';
+let WORD_TAP_SOUND = (() => {
+  try { const v = localStorage.getItem(WORD_TAP_SOUND_KEY); return v === null ? true : v === '1'; }
+  catch(e){ return true; }
+})();
+let WORD_TAP_MEANING = (() => {
+  try { const v = localStorage.getItem(WORD_TAP_MEANING_KEY); return v === null ? true : v === '1'; }
+  catch(e){ return true; }
+})();
+function toggleWordTapSound(){
+  WORD_TAP_SOUND = !WORD_TAP_SOUND;
+  try{ localStorage.setItem(WORD_TAP_SOUND_KEY, WORD_TAP_SOUND ? '1' : '0'); }catch(e){}
+  return WORD_TAP_SOUND;
+}
+function toggleWordTapMeaning(){
+  WORD_TAP_MEANING = !WORD_TAP_MEANING;
+  try{ localStorage.setItem(WORD_TAP_MEANING_KEY, WORD_TAP_MEANING ? '1' : '0'); }catch(e){}
+  return WORD_TAP_MEANING;
+}
+
 /* =====================================================================
      OWNER MODE (وضع صاحب المشروع)
      يُفعَّل بكتابة كلمة سرية في مربع "ابحث عن كلمة" ثم الضغط Enter.
@@ -23433,6 +24182,22 @@ function showOwnerBadge(){
   badge.textContent = '🔓 وضع المالك';
   badge.style.cssText = 'position:fixed;top:8px;left:8px;z-index:999999;background:#1a1a1a;color:#ffd54a;font-size:11px;font-weight:bold;padding:4px 10px;border-radius:20px;box-shadow:0 2px 8px rgba(0,0,0,.4);font-family:sans-serif;pointer-events:none;opacity:0.85;';
   document.body.appendChild(badge);
+  if(!document.getElementById('owner-check-translations-btn')){
+    const checkBtn = document.createElement('button');
+    checkBtn.id = 'owner-check-translations-btn';
+    checkBtn.textContent = '🔍 فحص الترجمات';
+    checkBtn.style.cssText = 'position:fixed;top:8px;left:120px;z-index:999999;background:#1a1a1a;color:#ffd54a;font-size:11px;font-weight:bold;padding:4px 10px;border-radius:20px;box-shadow:0 2px 8px rgba(0,0,0,.4);font-family:sans-serif;border:none;cursor:pointer;opacity:0.85;';
+    checkBtn.onclick = () => {
+      const rows = checkMissingTranslations();
+      if(rows.length === 0){
+        alert('✅ لا توجد كلمات ناقصة في القاموس — كل كلمات القصص مغطاة.');
+      } else {
+        const preview = rows.slice(0, 25).map(r => `${r.word} (${r.count}× — ${r.stories})`).join('\n');
+        alert(`⚠️ يوجد ${rows.length} كلمة ناقصة في القاموس.\nالقائمة الكاملة مطبوعة في console (F12).\n\nأول 25 كلمة:\n${preview}`);
+      }
+    };
+    document.body.appendChild(checkBtn);
+  }
 }
 function hideOwnerBadge(){
   const badge = document.getElementById('owner-mode-badge');
@@ -23458,6 +24223,7 @@ if(OWNER_MODE){
      [HARD WORDS UI]      refreshAllGoldenWords | renderHardWordsPanel
      [WORD COUNTER]       شريط عداد الكلمات المتعلَّمة
      [QUIZ]               اختبار الكلمات — buildQuiz ونتائجه
+     [MISSING TRANSLATIONS] checkMissingTranslations() — افحص بعد إضافة أي قصة جديدة
      [THEME]              تبديل الوضع الداكن/الفاتح
      [SPEECH SETTINGS]    إعدادات صوت النطق (السرعة، الصوت)
      [SPEECH]             دوال نطق الكلمات/الجمل (speak, TTS)
@@ -24708,14 +25474,10 @@ function openSmartDailySession(){
   app.innerHTML = '';
   const sCard = document.createElement('div');
   sCard.className = 'card';
-  const backBtnS = document.createElement('button');
-  backBtnS.className = 'back-toggle';
-  backBtnS.textContent = '↩';
-  backBtnS.onclick = openVocabReviewMenu;
+  const backBtnS = createBackToggle(openVocabReviewMenu);
   const topBarS = document.createElement('div');
   topBarS.className = 'card-top-bar';
-  const bwS = document.createElement('div'); bwS.className='card-top-bar-right'; bwS.appendChild(backBtnS);
-  topBarS.appendChild(bwS);
+  topBarS.appendChild(wrapBackToggle(backBtnS));
   sCard.appendChild(topBarS);
 
   const dueWords = getDueWords();
@@ -24743,7 +25505,14 @@ function openSmartDailySession(){
     return;
   }
 
-  const queue = shuffleArray(dueWords).map((word, i) => ({ word, type: availTypes[i % availTypes.length] }));
+  const dictationTypes = availTypes.filter(t => t !== 'dictation');
+  const queue = shuffleArray(dueWords).map((word, i) => {
+    /* Sandbox Mode: A2 يستثني الكلمات المركّبة من نمط الإملاء (نفس قيد buildDictation)
+       فتُستبدل بنمط آخر متاح بدلاً منها بدل عرضها بلا فاصل بين الكلمتين */
+    const types = (CURRENT_LEVEL === 'A2' && word.includes(' ') && dictationTypes.length)
+      ? dictationTypes : availTypes;
+    return { word, type: types[i % types.length] };
+  });
 
   const progWrap = document.createElement('div');
   progWrap.className = 'dict-progress-wrap';
@@ -24794,6 +25563,7 @@ function openSmartDailySession(){
     sub.className = 'quiz-sub';
     sub.textContent = typeLabel('mcq');
     body.appendChild(sub);
+    body.appendChild(buildDirectionToggle(() => renderNext()));
     const direction = resolveQuizDirection();
     const meaning = wordMeaning(word);
     const prompt = direction === 'ar2en' ? meaning : word;
@@ -24843,6 +25613,7 @@ function openSmartDailySession(){
     sub.className = 'quiz-sub';
     sub.textContent = typeLabel('recall');
     body.appendChild(sub);
+    body.appendChild(buildDirectionToggle(() => renderNext()));
     const direction = resolveQuizDirection();
     const meaning = wordMeaning(word);
     const prompt = direction === 'ar2en' ? meaning : word;
@@ -24933,13 +25704,22 @@ function openSmartDailySession(){
     const boxesWrap = document.createElement('div');
     boxesWrap.className = 'dict-boxes';
     const inputs = [];
-    for(let i = 0; i < letters.length; i++){
-      const inp = document.createElement('input');
-      inp.className = 'dict-box';
-      inp.maxLength = 1;
-      inp.addEventListener('input', () => { if(inp.value && inputs[i+1]) inputs[i+1].focus(); });
-      inputs.push(inp);
-      boxesWrap.appendChild(inp);
+    for(let i = 0; i < word.length; i++){
+      const ch = word[i];
+      if(/[a-zA-Z]/.test(ch)){
+        const inp = document.createElement('input');
+        inp.className = 'dict-box';
+        inp.maxLength = 1;
+        const li = inputs.length;
+        inp.addEventListener('input', () => { if(inp.value && inputs[li+1]) inputs[li+1].focus(); });
+        inputs.push(inp);
+        boxesWrap.appendChild(inp);
+      } else {
+        const spacer = document.createElement('span');
+        spacer.className = 'dict-box-space';
+        spacer.textContent = ch === ' ' ? '' : ch;
+        boxesWrap.appendChild(spacer);
+      }
     }
     body.appendChild(boxesWrap);
     setTimeout(() => { speak(word, null); inputs[0] && inputs[0].focus(); }, 300);
@@ -24971,12 +25751,6 @@ function openSmartDailySession(){
     r.style.cssText = 'text-align:center;padding:24px 12px;font-family:Tahoma,sans-serif;direction:rtl;';
     r.innerHTML = `<div style="font-size:40px;">🏆</div><div style="font-size:18px;margin-top:8px;">انتهت الجلسة!</div><div style="margin-top:6px;color:var(--ink);opacity:0.8;">✅ ${stats.correct} صحيحة · ❌ ${stats.wrong} خاطئة من أصل ${queue.length}</div>`;
     body.appendChild(r);
-    const doneBtn = document.createElement('button');
-    doneBtn.className = 'quiz-opt';
-    doneBtn.style.marginTop = '14px';
-    doneBtn.textContent = '↩ رجوع';
-    doneBtn.onclick = openVocabReviewMenu;
-    body.appendChild(doneBtn);
   }
 
   renderNext();
@@ -24992,14 +25766,10 @@ function openOtherExercisesMenu(){
   app.innerHTML = '';
   const oCard = document.createElement('div');
   oCard.className = 'card';
-  const backBtnO = document.createElement('button');
-  backBtnO.className = 'back-toggle';
-  backBtnO.textContent = '↩';
-  backBtnO.onclick = openPracticeMenu;
+  const backBtnO = createBackToggle(openPracticeMenu);
   const topBarO = document.createElement('div');
   topBarO.className = 'card-top-bar';
-  const bwO = document.createElement('div'); bwO.className='card-top-bar-right'; bwO.appendChild(backBtnO);
-  topBarO.appendChild(bwO);
+  topBarO.appendChild(wrapBackToggle(backBtnO));
   oCard.appendChild(topBarO);
   const badgeO = document.createElement('div');
   badgeO.className = 'badge';
@@ -25047,14 +25817,10 @@ function openPracticeMenu(){
   const pCard = document.createElement('div');
   pCard.className = 'card';
 
-  const backBtnP = document.createElement('button');
-  backBtnP.className = 'back-toggle';
-  backBtnP.textContent = '↩';
-  backBtnP.onclick = renderHome;
+  const backBtnP = createBackToggle(renderHome);
   const topBarP = document.createElement('div');
   topBarP.className = 'card-top-bar';
-  const bwP = document.createElement('div'); bwP.className = 'card-top-bar-right'; bwP.appendChild(backBtnP);
-  topBarP.appendChild(bwP);
+  topBarP.appendChild(wrapBackToggle(backBtnP));
   pCard.appendChild(topBarP);
 
   const badgeP = document.createElement('div');
@@ -25105,14 +25871,10 @@ function openVocabReviewMenu(){
   const vCard = document.createElement('div');
   vCard.className = 'card';
 
-  const backBtnV = document.createElement('button');
-  backBtnV.className = 'back-toggle';
-  backBtnV.textContent = '↩';
-  backBtnV.onclick = openPracticeMenu;
+  const backBtnV = createBackToggle(openPracticeMenu);
   const topBarV = document.createElement('div');
   topBarV.className = 'card-top-bar';
-  const bwV = document.createElement('div'); bwV.className = 'card-top-bar-right'; bwV.appendChild(backBtnV);
-  topBarV.appendChild(bwV);
+  topBarV.appendChild(wrapBackToggle(backBtnV));
   vCard.appendChild(topBarV);
 
   const badgeV = document.createElement('div');
@@ -25150,14 +25912,10 @@ function openVocabReviewMenu(){
         app.innerHTML = '';
         const drCard = document.createElement('div');
         drCard.className = 'card';
-        const backBtnDR = document.createElement('button');
-        backBtnDR.className = 'back-toggle';
-        backBtnDR.textContent = '↩';
-        backBtnDR.onclick = openVocabReviewMenu;
+        const backBtnDR = createBackToggle(openVocabReviewMenu);
         const topBarDR = document.createElement('div');
         topBarDR.className = 'card-top-bar';
-        const bwDR = document.createElement('div'); bwDR.className='card-top-bar-right'; bwDR.appendChild(backBtnDR);
-        topBarDR.appendChild(bwDR);
+        topBarDR.appendChild(wrapBackToggle(backBtnDR));
         drCard.appendChild(topBarDR);
         const badgeDR = document.createElement('div');
         badgeDR.className = 'badge';
@@ -25180,14 +25938,10 @@ function openVocabReviewMenu(){
         app.innerHTML = '';
         const hCard = document.createElement('div');
         hCard.className = 'card';
-        const backBtnH = document.createElement('button');
-        backBtnH.className = 'back-toggle';
-        backBtnH.textContent = '↩';
-        backBtnH.onclick = openVocabReviewMenu;
+        const backBtnH = createBackToggle(openVocabReviewMenu);
         const topBarH = document.createElement('div');
         topBarH.className = 'card-top-bar';
-        const bwH = document.createElement('div'); bwH.className='card-top-bar-right'; bwH.appendChild(backBtnH);
-        topBarH.appendChild(bwH);
+        topBarH.appendChild(wrapBackToggle(backBtnH));
         hCard.appendChild(topBarH);
         const badgeH = document.createElement('div');
         badgeH.className = 'badge';
@@ -25209,14 +25963,10 @@ function openVocabReviewMenu(){
         app.innerHTML = '';
         const qCard = document.createElement('div');
         qCard.className = 'card';
-        const backBtn2 = document.createElement('button');
-        backBtn2.className = 'back-toggle';
-        backBtn2.textContent = '↩';
-        backBtn2.onclick = openVocabReviewMenu;
+        const backBtn2 = createBackToggle(openVocabReviewMenu);
         const topBarQ2 = document.createElement('div');
         topBarQ2.className = 'card-top-bar';
-        const bw2 = document.createElement('div'); bw2.className='card-top-bar-right'; bw2.appendChild(backBtn2);
-        topBarQ2.appendChild(bw2);
+        topBarQ2.appendChild(wrapBackToggle(backBtn2));
         qCard.appendChild(topBarQ2);
         const badge2 = document.createElement('div');
         badge2.className = 'badge';
@@ -25255,14 +26005,10 @@ function openWordSearchScreen(initialQuery){
   app.innerHTML = '';
   const wCard = document.createElement('div');
   wCard.className = 'card';
-  const backBtnW = document.createElement('button');
-  backBtnW.className = 'back-toggle';
-  backBtnW.textContent = '↩';
-  backBtnW.onclick = renderHome;
+  const backBtnW = createBackToggle(renderHome);
   const topBarW = document.createElement('div');
   topBarW.className = 'card-top-bar';
-  const bwW = document.createElement('div'); bwW.className = 'card-top-bar-right'; bwW.appendChild(backBtnW);
-  topBarW.appendChild(bwW);
+  topBarW.appendChild(wrapBackToggle(backBtnW));
   wCard.appendChild(topBarW);
   const badgeW = document.createElement('div');
   badgeW.className = 'badge';
@@ -25590,14 +26336,10 @@ function openPhrasalVerbsScreen(){
   app.innerHTML = '';
   const pCard = document.createElement('div');
   pCard.className = 'card';
-  const backBtnP = document.createElement('button');
-  backBtnP.className = 'back-toggle';
-  backBtnP.textContent = '↩';
-  backBtnP.onclick = openPracticeMenu;
+  const backBtnP = createBackToggle(openOtherExercisesMenu);
   const topBarP = document.createElement('div');
   topBarP.className = 'card-top-bar';
-  const bwP = document.createElement('div'); bwP.className = 'card-top-bar-right'; bwP.appendChild(backBtnP);
-  topBarP.appendChild(bwP);
+  topBarP.appendChild(wrapBackToggle(backBtnP));
   pCard.appendChild(topBarP);
   const badgeP = document.createElement('div');
   badgeP.className = 'badge';
@@ -25738,14 +26480,10 @@ function openFlashcardsScreen(){
   app.innerHTML = '';
   const fCard = document.createElement('div');
   fCard.className = 'card';
-  const backBtnF = document.createElement('button');
-  backBtnF.className = 'back-toggle';
-  backBtnF.textContent = '↩';
-  backBtnF.onclick = openPracticeMenu;
+  const backBtnF = createBackToggle(openVocabReviewMenu);
   const topBarF = document.createElement('div');
   topBarF.className = 'card-top-bar';
-  const bwF = document.createElement('div'); bwF.className = 'card-top-bar-right'; bwF.appendChild(backBtnF);
-  topBarF.appendChild(bwF);
+  topBarF.appendChild(wrapBackToggle(backBtnF));
   fCard.appendChild(topBarF);
   const badgeF = document.createElement('div');
   badgeF.className = 'badge';
@@ -25764,14 +26502,10 @@ function openDictationScreen(){
   app.innerHTML = '';
   const dCard = document.createElement('div');
   dCard.className = 'card';
-  const backBtnD = document.createElement('button');
-  backBtnD.className = 'back-toggle';
-  backBtnD.textContent = '↩';
-  backBtnD.onclick = openPracticeMenu;
+  const backBtnD = createBackToggle(openVocabReviewMenu);
   const topBarD = document.createElement('div');
   topBarD.className = 'card-top-bar';
-  const bwD = document.createElement('div'); bwD.className = 'card-top-bar-right'; bwD.appendChild(backBtnD);
-  topBarD.appendChild(bwD);
+  topBarD.appendChild(wrapBackToggle(backBtnD));
   dCard.appendChild(topBarD);
   const badgeD = document.createElement('div');
   badgeD.className = 'badge';
@@ -26432,14 +27166,6 @@ function runExercise(config){
     ? [...new Set(config.words)].filter(w => WORD_TRANSLATIONS[w] || HARD_WORDS[w])
     : Object.keys(HARD_WORDS).filter(w => !CURRENT_LEVEL || hardWordBelongsToLevel(w, CURRENT_LEVEL));
 
-  if(isCategory){
-    const backRow = document.createElement('button');
-    backRow.className = 'back-toggle';
-    backRow.style.cssText = 'position:static;margin-bottom:8px;';
-    backRow.textContent = '↩ فئة أخرى';
-    backRow.onclick = backAction || openCategoryQuizScreen;
-    card.appendChild(backRow);
-  }
 
   const words = isCategory ? rawWords.filter(w => WORD_TRANSLATIONS[w]) : rawWords;
   if(words.length < 2){
@@ -26537,6 +27263,15 @@ function runExercise(config){
     prog.textContent = `سؤال ${current + 1} من ${questions.length}`;
     body.appendChild(prog);
 
+    /* زر تبديل اتجاه الأسئلة (EN→AR / AR→EN / تلقائي) — يظهر فقط حين لا
+       يكون الاتجاه مفروضاً من المتصل (كاختبار الفئة أو مختبر الفروقات) */
+    if(!config.direction && (mode === 'mcq' || mode === 'recall')){
+      body.appendChild(buildDirectionToggle(() => {
+        questions = buildQuestions();
+        renderQuestion();
+      }));
+    }
+
     const wordDiv = document.createElement('div');
     wordDiv.className = 'quiz-word';
     wordDiv.dir = q.direction === 'ar2en' ? 'rtl' : 'ltr';
@@ -26608,7 +27343,7 @@ function runExercise(config){
         if(ok){
           input.style.borderColor = '#2a9d5c';
           feedback.innerHTML = `✅ صحيح! ${q.direction === 'ar2en' ? 'الكلمة' : 'المعنى'}: <b>${q.correct}</b>`;
-          feedback.style.color = '#1a5c35';
+          feedback.classList.add('quiz-feedback-ok');
           score++;
           refreshAllGoldenWords();
           speak(q.word, null);
@@ -26636,7 +27371,7 @@ function runExercise(config){
         } else {
           input.style.borderColor = '#e05050';
           feedback.innerHTML = `❌ الإجابة الصحيحة: <b>${q.correct}</b>`;
-          feedback.style.color = '#7a1a1a';
+          feedback.classList.add('quiz-feedback-bad');
           if(!missed.includes(q.word)) missed.push(q.word);
           if(!isHardWord(q.word)) addHardWord(q.word, WORD_TRANSLATIONS[q.word] || HARD_WORDS[q.word] || q.correct, 'auto');
           srsSchedule(q.word, 'again');
@@ -26741,20 +27476,13 @@ function runExercise(config){
       box.appendChild(retryBtn);
       body.appendChild(box);
     }
-
-    const back = document.createElement('button');
-    back.className = 'home-btn';
-    back.style.marginTop = '8px';
-    back.textContent = config.backLabel || (isCategory ? '🗂️ فئة أخرى' : (backAction ? '↩ فئة أخرى' : '🏠 العودة للمكتبة'));
-    back.onclick = isCategory ? (backAction || openCategoryQuizScreen) : (backAction || renderHome);
-    body.appendChild(back);
   }
 
   renderQuestion();
 
   /* ---- وضع البطاقات التعليمية (Flashcards) ---- */
   function runFlashcards(){
-    const fcWords = config.words || Object.keys(HARD_WORDS).filter(w => HARD_WORDS[w] || WORD_TRANSLATIONS[w]);
+    const fcWords = config.words || Object.keys(HARD_WORDS).filter(w => !CURRENT_LEVEL || hardWordBelongsToLevel(w, CURRENT_LEVEL));
     if(fcWords.length < 1){
       const msg = document.createElement('div');
       msg.className = 'fc-empty';
@@ -26786,14 +27514,6 @@ function runExercise(config){
         again.textContent = '↺ مراجعة جديدة';
         again.onclick = () => runExercise(config);
         card.appendChild(again);
-        if(config.backAction){
-          const cont = document.createElement('button');
-          cont.className = 'home-btn';
-          cont.style.marginTop = '8px';
-          cont.textContent = config.backLabel || '🏠 العودة للمكتبة';
-          cont.onclick = config.backAction;
-          card.appendChild(cont);
-        }
         return;
       }
 
@@ -26969,14 +27689,10 @@ function openRecallCategoryScreen(){
   app.innerHTML = '';
   const rcCard = document.createElement('div');
   rcCard.className = 'card';
-  const backBtnRC = document.createElement('button');
-  backBtnRC.className = 'back-toggle';
-  backBtnRC.textContent = '↩';
-  backBtnRC.onclick = openPracticeMenu;
+  const backBtnRC = createBackToggle(openOtherExercisesMenu);
   const topBarRC = document.createElement('div');
   topBarRC.className = 'card-top-bar';
-  const bwRC = document.createElement('div'); bwRC.className = 'card-top-bar-right'; bwRC.appendChild(backBtnRC);
-  topBarRC.appendChild(bwRC);
+  topBarRC.appendChild(wrapBackToggle(backBtnRC));
   rcCard.appendChild(topBarRC);
 
   const badgeRC = document.createElement('div');
@@ -27000,12 +27716,19 @@ function openRecallCategoryScreen(){
     subRC.style.display = 'none';
     quizBodyRC.style.display = '';
     quizBodyRC.innerHTML = '';
+    backBtnRC.onclick = () => {
+      listRC.style.display = '';
+      subRC.style.display = '';
+      quizBodyRC.style.display = 'none';
+      backBtnRC.onclick = openOtherExercisesMenu;
+    };
     runExercise({
       card: quizBodyRC, words, mode: 'recall',
       backAction: () => {
         listRC.style.display = '';
         subRC.style.display = '';
         quizBodyRC.style.display = 'none';
+        backBtnRC.onclick = openOtherExercisesMenu;
       },
       questionCount: opts && opts.questionCount,
       perWordCategory: opts && opts.perWordCategory
@@ -27048,14 +27771,10 @@ function openCategoryQuizScreen(){
   app.innerHTML = '';
   const cCard = document.createElement('div');
   cCard.className = 'card';
-  const backBtnC = document.createElement('button');
-  backBtnC.className = 'back-toggle';
-  backBtnC.textContent = '↩';
-  backBtnC.onclick = openPracticeMenu;
+  const backBtnC = createBackToggle(openOtherExercisesMenu);
   const topBarC = document.createElement('div');
   topBarC.className = 'card-top-bar';
-  const bwC = document.createElement('div'); bwC.className = 'card-top-bar-right'; bwC.appendChild(backBtnC);
-  topBarC.appendChild(bwC);
+  topBarC.appendChild(wrapBackToggle(backBtnC));
   cCard.appendChild(topBarC);
 
   const badgeC = document.createElement('div');
@@ -27076,6 +27795,7 @@ function openCategoryQuizScreen(){
 
   function startCategory(words, label, opts){
     quizBodyC.innerHTML = '';
+    backBtnC.onclick = openCategoryQuizScreen;
     runExercise({
       card: quizBodyC, words, mode: 'mcq', categoryLabel: label,
       backAction: openCategoryQuizScreen,
@@ -27481,6 +28201,11 @@ function clearSelectedLevel(){
   try { localStorage.removeItem('selectedLevel'); } catch(e){}
 }
 CURRENT_LEVEL = getSelectedLevel();
+/* Sandbox Mode: لم تعد هناك شاشة "اختر مستواك" منفصلة — المستوى يُختار من
+   لوحة الإعدادات في أي وقت، لذا نبدأ بـ A1 افتراضياً بدل ترك المستخدم بلا مستوى محدد */
+if(!CURRENT_LEVEL){
+  setSelectedLevel('A1');
+}
 
 /* ---- THEME (فاتح / داكن) ---- */
   // دوال: applyTheme | toggleTheme | renderThemeIcon
@@ -27724,6 +28449,34 @@ function buildSpeechSettings(){
   fontWrap.appendChild(fontPlus);
   bar.appendChild(fontWrap);
 
+  // أزرار تبديل: عند الضغط على كلمة، هل يُسمَع صوتها؟ وهل يظهر معناها؟
+  const tapWrap = document.createElement('div');
+  tapWrap.className = 'speech-rate-wrap';
+
+  const soundToggle = document.createElement('button');
+  soundToggle.type = 'button';
+  soundToggle.className = 'word-tap-toggle' + (WORD_TAP_SOUND ? ' on' : '');
+  soundToggle.textContent = '🔊 نطق';
+  soundToggle.setAttribute('aria-label', 'تشغيل/إيقاف نطق الكلمة عند الضغط عليها');
+  soundToggle.onclick = () => {
+    const on = toggleWordTapSound();
+    soundToggle.classList.toggle('on', on);
+  };
+
+  const meaningToggle = document.createElement('button');
+  meaningToggle.type = 'button';
+  meaningToggle.className = 'word-tap-toggle' + (WORD_TAP_MEANING ? ' on' : '');
+  meaningToggle.textContent = '💬 معنى';
+  meaningToggle.setAttribute('aria-label', 'تشغيل/إيقاف ظهور معنى الكلمة عند الضغط عليها');
+  meaningToggle.onclick = () => {
+    const on = toggleWordTapMeaning();
+    meaningToggle.classList.toggle('on', on);
+  };
+
+  tapWrap.appendChild(soundToggle);
+  tapWrap.appendChild(meaningToggle);
+  bar.appendChild(tapWrap);
+
   return bar;
 }
 
@@ -27955,8 +28708,9 @@ function buildWordSpans(text){
         return;
       }
       closeActiveWordPopup();
-      speak(cleanKey, null);
+      if(WORD_TAP_SOUND) speak(cleanKey, null);
       markWordLearned(cleanKey);
+      if(!WORD_TAP_MEANING) return; /* المستخدم عطّل ظهور نافذة المعنى */
       const meaning = lookupMeaning(cleanKey) || '؟';
       const popup = document.createElement('span');
       popup.className = 'word-popup';
@@ -28160,6 +28914,17 @@ function renderHome(){
       <span id="topSettingsThemeLabel">الوضع الليلي</span>
       <span class="tsp-icon" id="topSettingsThemeIcon">🌙</span>
     </button>
+    <div class="tsp-divider"></div>
+    <button type="button" class="tsp-row tsp-level-toggle" id="topSettingsLevelToggle" role="menuitem" aria-expanded="false" aria-haspopup="true">
+      <span>المستوى</span>
+      <span style="display:flex;align-items:center;gap:6px;">
+        <span class="tsp-level-badge" id="topSettingsLevelBadge">${CURRENT_LEVEL || '—'}</span>
+        <span class="tsp-level-chevron">▾</span>
+      </span>
+    </button>
+    <div class="tsp-level-list" id="topSettingsLevelList">
+      <div class="tsp-level-list-inner" id="topSettingsLevelListInner"></div>
+    </div>
   `;
   settingsWrap.appendChild(settingsBtn);
   settingsWrap.appendChild(settingsPanel);
@@ -28186,6 +28951,18 @@ function renderHome(){
     settingsThemeRow.onclick = () => {
       toggleTheme();
       syncSettingsThemeRow();
+    };
+  }
+  const settingsLevelToggle = settingsPanel.querySelector('#topSettingsLevelToggle');
+  const settingsLevelList = settingsPanel.querySelector('#topSettingsLevelList');
+  const settingsLevelListInner = settingsPanel.querySelector('#topSettingsLevelListInner');
+  if(settingsLevelToggle && settingsLevelList){
+    settingsLevelToggle.onclick = (e) => {
+      e.stopPropagation();
+      const willOpen = !settingsLevelList.classList.contains('open');
+      settingsLevelList.classList.toggle('open', willOpen);
+      settingsLevelToggle.classList.toggle('open', willOpen);
+      settingsLevelToggle.setAttribute('aria-expanded', String(willOpen));
     };
   }
 
@@ -28367,45 +29144,33 @@ function renderHome(){
     return ai - bi;
   });
 
-  /* ---- شاشة اختيار المستوى (تظهر أولاً إن لم يُختر مستوى بعد) ---- */
-  if(!CURRENT_LEVEL){
-    const levelSelectWrap = document.createElement('div');
-    levelSelectWrap.className = 'level-select-wrap';
-    levelSelectWrap.innerHTML = '<div class="level-select-title">اختر مستواك — Choose your level</div>';
-    levelOrder.forEach(lvlLabel => {
+  /* ---- تعبئة صف "المستوى" داخل لوحة الإعدادات، بعد أن أصبح levelOrder/
+     levelGroups جاهزين — تعيد استخدام نفس البيانات المحسوبة أعلاه بلا أي
+     حساب إضافي. حلّت محل شاشة "اختر مستواك" القديمة لتبسيط تجربة المتعلم:
+     المستوى يُختار مباشرة من الإعدادات بدل شاشة وسيطة منفصلة. ---- */
+  if(settingsLevelListInner){
+    settingsLevelListInner.innerHTML = levelOrder.map(lvlLabel => {
       const lvlCss = lvlLabel.toLowerCase();
       const { p1, p2, p3 } = levelGroups[lvlLabel];
       const allIds = [...p1, ...p2, ...p3];
       const completedCount = allIds.filter(id => getStoryState(id).completed).length;
-      const lvlProg = levelProgress(allIds);
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'level-box level-box-' + lvlCss;
-      btn.innerHTML = `
-        <span class="level-box-tag level-${lvlCss}">${lvlLabel}</span>
-        <span class="level-box-info">
-          <span class="level-box-count">${allIds.length} stories · ${completedCount}/${allIds.length} completed · ${lvlProg.pct}%</span>
-          <span class="level-box-count-ar">قصص هذا المستوى</span>
-          <span class="level-progress-wrap"><span class="level-progress-bar level-progress-bar-${lvlCss}${lvlProg.pct >= 100 ? ' level-progress-bar-full' : ''}" style="width:${lvlProg.pct}%"></span></span>
-        </span>
-        <span class="level-box-arrow">›</span>
-      `;
-      btn.onclick = () => { setSelectedLevel(lvlLabel); renderHome(); };
-      levelSelectWrap.appendChild(btn);
+      const isActive = lvlLabel === CURRENT_LEVEL;
+      return `
+        <button type="button" class="tsp-level-item${isActive ? ' active' : ''}" data-lvl="${lvlLabel}" role="menuitemradio" aria-checked="${isActive}">
+          <span class="tsp-level-tag level-${lvlCss}">${lvlLabel}</span>
+          <span class="tsp-level-meta">${completedCount}/${allIds.length} قصة مكتملة</span>
+          <span class="tsp-level-check">${isActive ? '✓' : ''}</span>
+        </button>`;
+    }).join('');
+    settingsLevelListInner.querySelectorAll('.tsp-level-item').forEach(item => {
+      item.onclick = () => {
+        const lvl = item.dataset.lvl;
+        if(settingsLevelList) settingsLevelList.classList.remove('open');
+        if(settingsPanel) settingsPanel.classList.remove('open');
+        if(lvl !== CURRENT_LEVEL){ setSelectedLevel(lvl); renderHome(); }
+      };
     });
-    card.appendChild(levelSelectWrap);
-    app.appendChild(card);
-    renderThemeIcon();
-    return;
   }
-
-  /* ---- تصفية القصص لعرض المستوى المختار فقط ---- */
-  const levelBackBtn = document.createElement('button');
-  levelBackBtn.type = 'button';
-  levelBackBtn.className = 'level-back-btn';
-  levelBackBtn.innerHTML = '↩ Levels — العودة للمستويات';
-  levelBackBtn.onclick = () => { clearSelectedLevel(); renderHome(); };
-  card.appendChild(levelBackBtn);
 
   const filteredLevelOrder = levelOrder.filter(l => l === CURRENT_LEVEL);
 
@@ -28437,9 +29202,9 @@ function renderHome(){
     achGrid.appendChild(card2);
   });
 
-  /* Sandbox Mode: شارة Grand Master تخص المكتبة كاملة، لذا تظهر فقط
-     في شاشة اختيار المستوى الرئيسية (لا يوجد CURRENT_LEVEL). */
-  if(!CURRENT_LEVEL){
+  /* Sandbox Mode: شارة Grand Master تخص المكتبة كاملة — تظهر دائماً الآن
+     ضمن معرض إنجازات المستوى الحالي، بعد إزالة شاشة "اختر مستواك" المنفصلة. */
+  {
     const grandMastered = isGloballyMastered();
     const grandCard = document.createElement('div');
     grandCard.className = 'achievement-card' + (grandMastered ? ' earned' : '');
@@ -28452,18 +29217,20 @@ function renderHome(){
   card.appendChild(achSection);
 
   /* ---- helper: build one story card ---- */
-  function buildStoryItem(id, lvl, lvlLabel){
+  function buildStoryItem(id, lvl, lvlLabel, isCurrent){
     const story = STORIES[id];
     const state = getStoryState(id);
     const mastered = isStoryMastered(id);
     const unlocked = isStoryUnlocked(id);
     const item = document.createElement('div');
-    item.className = 'story-item level-' + lvl + '-item' + (state.completed ? ' completed' : '') + (unlocked ? '' : ' locked');
+    item.className = 'story-item level-' + lvl + '-item' + (state.completed ? ' completed' : '') + (unlocked ? '' : ' locked') + (isCurrent ? ' current-story' : '');
+    if(isCurrent) item.dataset.currentStory = '1';
     const gInfo = GRAMMAR_INDEX[id];
     item.dataset.tense = gInfo ? gInfo.category : '';
     const inProgress = !state.completed && state.historyStack.length > 1;
     const icon = story.icon || '📖';
     item.innerHTML = `
+      ${isCurrent ? `<div class="story-current-badge">📍 استمر من هنا</div>` : ''}
       ${mastered ? `<span class="story-badge-corner" title="كل النهايات مكتشفة — All endings discovered">💎</span>` : ''}
       <div class="story-item-body">
         <div class="story-item-top">
@@ -28501,30 +29268,74 @@ function renderHome(){
   }
 
   /* ---- helper: build a part sub-section ---- */
-  function buildPartSection(ids, lvl, lvlLabel, partNum){
+  function buildPartSection(ids, lvl, lvlLabel, partNum, autoOpen){
     if(!ids.length) return null;
-    const wrap = document.createElement('div');
-    wrap.className = 'part-section';
+    /* القصة الحالية: أول قصة مفتوحة لم تُكتمل بعد — نقطة استئناف المتعلم */
+    const currentId = ids.find(id => isStoryUnlocked(id) && !getStoryState(id).completed) || null;
 
-    const partHeader = document.createElement('div');
-    partHeader.className = 'part-header';
+    const wrap = document.createElement('div');
+    wrap.className = 'part-section' + (autoOpen ? ' open' : '');
+
+    const partHeader = document.createElement('button');
+    partHeader.type = 'button';
     const partLabel = partNum === 1
       ? `<span class="part-badge part-1">⭐ Beginner · مبتدئ</span><span class="part-desc">قصص أسهل في هذا المستوى</span>`
       : partNum === 2
       ? `<span class="part-badge part-2">⭐⭐ Advanced · متقدم</span><span class="part-desc">قصص أصعب في هذا المستوى</span>`
       : `<span class="part-badge part-3">⭐⭐⭐ Plus · إضافي</span><span class="part-desc">قصص إضافية بمستوى أعلى قليلاً (+)</span>`;
-    partHeader.innerHTML = partLabel;
+    partHeader.className = 'part-header';
+    partHeader.innerHTML = partLabel + '<span class="part-header-arrow">▾</span>';
+    partHeader.onclick = () => wrap.classList.toggle('open');
     wrap.appendChild(partHeader);
+
+    const partContent = document.createElement('div');
+    partContent.className = 'part-content';
 
     const grid = document.createElement('div');
     grid.className = 'story-grid';
-    ids.forEach(id => grid.appendChild(buildStoryItem(id, lvl, lvlLabel)));
-    wrap.appendChild(grid);
+    ids.forEach(id => grid.appendChild(buildStoryItem(id, lvl, lvlLabel, id === currentId)));
+    partContent.appendChild(grid);
+
+    wrap.appendChild(partContent);
     return wrap;
+  }
+
+  /* ---- helper: يحدد أي جزء (Beginner/Advanced/Plus) يجب فتحه تلقائياً
+     حسب موضع المتعلم — أول جزء فيه قصة مفتوحة وغير مكتملة (قيد التقدّم)،
+     وإن لم توجد، آخر جزء وصل إليه المتعلم، وإلا الجزء الأول افتراضياً ---- */
+  function getActivePartNum(p1, p2, p3){
+    const parts = [p1, p2, p3];
+    for(let i = 0; i < parts.length; i++){
+      const inProgress = parts[i].some(id => isStoryUnlocked(id) && !getStoryState(id).completed);
+      if(inProgress) return i + 1;
+    }
+    for(let i = parts.length - 1; i >= 0; i--){
+      if(parts[i].some(isStoryUnlocked)) return i + 1;
+    }
+    return 1;
   }
 
   const levelsWrap = document.createElement('div');
   levelsWrap.className = 'levels-wrap';
+
+  /* يُستخدم لتعليق مراقب التمرير الذكي لحظياً أثناء التمرير المبرمج الناتج عن نقرة يدوية */
+  let levelScrollSpySuspended = false;
+
+  /* ---- التمرير الذكي مباشرة نحو "القصة الحالية" (نقطة استئناف المتعلم) عند
+     فتح مستوى — بدل التوقف عند أعلى القائمة فقط ---- */
+  function scrollToCurrentStory(section, delay){
+    setTimeout(() => {
+      const target = section.querySelector('[data-current-story="1"]');
+      const fallback = section.querySelector('.level-box');
+      const el = target || fallback;
+      if(!el) return;
+      el.scrollIntoView({ behavior:'smooth', block:'center' });
+      if(target){
+        target.classList.add('current-story-pulse');
+        setTimeout(() => target.classList.remove('current-story-pulse'), 2900);
+      }
+    }, delay);
+  }
 
   filteredLevelOrder.forEach(lvlLabel => {
     const lvl = lvlLabel.toLowerCase().replace('+','\\+').replace('+','');
@@ -28558,10 +29369,10 @@ function renderHome(){
     const content = document.createElement('div');
     content.className = 'level-content';
 
-    const closeRow = document.createElement('button');
-    closeRow.className = 'level-close-btn';
-    closeRow.innerHTML = '✕ إغلاق واختيار مستوى آخر — Close & choose another level';
-    closeRow.onclick = (e) => { e.stopPropagation(); section.classList.remove('open'); };
+    const closeRow = createBackToggle((e) => { e.stopPropagation(); section.classList.remove('open'); }, {
+      className: 'level-close-btn',
+      html: '✕ إغلاق واختيار مستوى آخر — Close & choose another level'
+    });
 
     content.appendChild(closeRow);
 
@@ -28582,7 +29393,18 @@ function renderHome(){
       const applyTenseFilter = (tense) => {
         content.querySelectorAll('.story-item').forEach(item => {
           const show = !tense || item.dataset.tense === tense;
-          item.classList.toggle('tense-hidden', !show);
+          if(show){
+            item.style.display = '';
+            /* رحلة عرض ناعمة: نُزيل الإخفاء بعد إطارين حتى يلتقط المتصفح الانتقال */
+            requestAnimationFrame(() => {
+              requestAnimationFrame(() => item.classList.remove('tense-hidden'));
+            });
+          } else {
+            item.classList.add('tense-hidden');
+            setTimeout(() => {
+              if(item.classList.contains('tense-hidden')) item.style.display = 'none';
+            }, 320);
+          }
         });
       };
 
@@ -28614,35 +29436,57 @@ function renderHome(){
       content.appendChild(filterRow);
     }
 
-    const p1Section = buildPartSection(p1, lvlCss, lvlLabel, 1);
-    const p2Section = buildPartSection(p2, lvlCss, lvlLabel, 2);
-    const p3Section = buildPartSection(p3, lvlCss, lvlLabel, 3);
+    const activePart = getActivePartNum(p1, p2, p3);
+    const p1Section = buildPartSection(p1, lvlCss, lvlLabel, 1, activePart === 1);
+    const p2Section = buildPartSection(p2, lvlCss, lvlLabel, 2, activePart === 2);
+    const p3Section = buildPartSection(p3, lvlCss, lvlLabel, 3, activePart === 3);
     if(p1Section) content.appendChild(p1Section);
     if(p2Section) content.appendChild(p2Section);
     if(p3Section) content.appendChild(p3Section);
 
     levelBox.onclick = () => {
       const isOpen = section.classList.contains('open');
+      /* الضغط على أيقونة مستوى مفتوح بالفعل لا يخفي قصصه — الإغلاق فقط عبر زر "✕ إغلاق" */
+      if(isOpen) return;
+      levelScrollSpySuspended = true;
       levelsWrap.querySelectorAll('.level-section.open').forEach(s => {
-        if(s !== section) s.classList.remove('open');
+        s.classList.remove('open');
       });
-      section.classList.toggle('open', !isOpen);
-      if(!isOpen){
-        /* scroll to just below the level box so stories are visible immediately */
-        setTimeout(() => {
-          levelBox.scrollIntoView({ behavior:'smooth', block:'start' });
-        }, 50);
-      }
+      section.classList.add('open');
+      /* التمرير مباشرة نحو القصة الحالية للمتعلم داخل هذا المستوى */
+      scrollToCurrentStory(section, 60);
+      /* إعادة تفعيل المراقب بعد اكتمال التمرير السلس */
+      setTimeout(() => { levelScrollSpySuspended = false; }, 750);
     };
 
     section.appendChild(levelBox);
     section.appendChild(content);
     levelsWrap.appendChild(section);
     /* بما أن هذا هو المستوى الوحيد المعروض بعد التصفية، افتحه تلقائياً */
-    if(lvlLabel === CURRENT_LEVEL) section.classList.add('open');
+    if(lvlLabel === CURRENT_LEVEL){
+      section.classList.add('open');
+      scrollToCurrentStory(section, 400);
+    }
   });
 
   card.appendChild(levelsWrap);
+
+  /* ---- SMART SCROLL FOLDING (طي ذكي حسب موضع القراءة) ----
+     أثناء التمرير عبر القصص، يُفتح تلقائياً المستوى الذي وصل إليه المستخدم
+     ويُطوى ما قبله وما بعده — دون الحاجة لنقر يدوي. */
+  const levelScrollSpy = new IntersectionObserver((entries) => {
+    if(levelScrollSpySuspended) return;
+    entries.forEach(entry => {
+      if(!entry.isIntersecting) return;
+      const sec = entry.target.closest('.level-section');
+      if(!sec || sec.classList.contains('open')) return;
+      levelsWrap.querySelectorAll('.level-section.open').forEach(s => {
+        if(s !== sec) s.classList.remove('open');
+      });
+      sec.classList.add('open');
+    });
+  }, { root:null, rootMargin:'-42% 0px -42% 0px', threshold:0 });
+  levelsWrap.querySelectorAll('.level-box').forEach(box => levelScrollSpy.observe(box));
 
   /* ---- STICKY CLOSE BAR ---- */
   const stickyClose = document.createElement('button');
@@ -28719,14 +29563,10 @@ function openGrammarIndex(){
   const gCard = document.createElement('div');
   gCard.className = 'card';
 
-  const backBtnG = document.createElement('button');
-  backBtnG.className = 'back-toggle';
-  backBtnG.textContent = '↩';
-  backBtnG.onclick = renderHome;
+  const backBtnG = createBackToggle(renderHome);
   const topBarG = document.createElement('div');
   topBarG.className = 'card-top-bar';
-  const bwG = document.createElement('div'); bwG.className = 'card-top-bar-right'; bwG.appendChild(backBtnG);
-  topBarG.appendChild(bwG);
+  topBarG.appendChild(wrapBackToggle(backBtnG));
   gCard.appendChild(topBarG);
 
   const badgeG = document.createElement('div');
@@ -28857,7 +29697,7 @@ const GEN_BANK = {
     {ar:'العلّية', en:'the attic'}, {ar:'القبو', en:'the basement'},
     {ar:'المكتبة القديمة', en:'the old library'}, {ar:'محطة القطار', en:'the train station'},
     {ar:'الميناء', en:'the harbor'}, {ar:'الغابة', en:'the forest'},
-    {ar:'المقهى الصغير', en:'the small café'}, {ar:'الجامعة', en:'the university'}
+    {ar:'المقهى الصغير', en:'the small cafe'}, {ar:'الجامعة', en:'the university'}
   ],
   profession: [
     {ar:'كهربائي', en:'an electrician'}, {ar:'مصفف شعر', en:'a hairdresser'},
@@ -29554,17 +30394,11 @@ function renderGenerator(){
   card.className = 'card';
 
 
-  const backBtnG = document.createElement('button');
-  backBtnG.className = 'back-toggle';
-  backBtnG.textContent = '↩';
-  backBtnG.onclick = renderHome;
+  const backBtnG = createBackToggle(renderHome);
 
   const topBarG = document.createElement('div');
   topBarG.className = 'card-top-bar';
-  const rightWrapG = document.createElement('div');
-  rightWrapG.className = 'card-top-bar-right';
-  rightWrapG.appendChild(backBtnG);
-  topBarG.appendChild(rightWrapG);
+  topBarG.appendChild(wrapBackToggle(backBtnG));
   card.appendChild(topBarG);
 
   const badgeG = document.createElement('div');
@@ -29810,21 +30644,11 @@ function renderPlainPicker(storyId){
   card.className = 'card';
 
 
-  const backBtnPlain = document.createElement('button');
-  backBtnPlain.className = 'back-toggle';
-  backBtnPlain.textContent = '↩';
-  backBtnPlain.setAttribute('aria-label','Back to library');
-  backBtnPlain.onclick = renderHome;
+  const backBtnPlain = createBackToggle(renderHome, { ariaLabel: 'Back to library' });
 
   const topBarPlain = document.createElement('div');
   topBarPlain.className = 'card-top-bar';
   topBarPlain.appendChild(backBtnPlain);
-
-  const homeBtn = document.createElement('button');
-  homeBtn.className = 'home-btn';
-  homeBtn.textContent = '🏠 المكتبة';
-  homeBtn.onclick = renderHome;
-  topBarPlain.appendChild(homeBtn);
 
   card.appendChild(topBarPlain);
 
@@ -29896,11 +30720,7 @@ function renderPlainStory(storyId, pathIndex){
   card.className = 'card';
 
 
-  const backBtnPlain = document.createElement('button');
-  backBtnPlain.className = 'back-toggle';
-  backBtnPlain.textContent = '↩';
-  backBtnPlain.setAttribute('aria-label','Back to scenarios');
-  backBtnPlain.onclick = () => renderPlainPicker(storyId);
+  const backBtnPlain = createBackToggle(() => renderPlainPicker(storyId), { ariaLabel: 'Back to scenarios' });
 
   const posBtnPlain = document.createElement('button');
   posBtnPlain.className = 'theme-toggle pos-color-toggle';
@@ -29921,12 +30741,6 @@ function renderPlainStory(storyId, pathIndex){
   topBarPlain.appendChild(readBtnPlain);
   topBarPlain.appendChild(buildReadingFontControl());
   topBarPlain.appendChild(backBtnPlain);
-
-  const homeBtn = document.createElement('button');
-  homeBtn.className = 'home-btn';
-  homeBtn.textContent = '🏠 المكتبة';
-  homeBtn.onclick = renderHome;
-  topBarPlain.appendChild(homeBtn);
 
   card.appendChild(topBarPlain);
   renderPosColorIcon();
@@ -30030,14 +30844,10 @@ function renderPlainStory(storyId, pathIndex){
     app.innerHTML = '';
     const qCard = document.createElement('div');
     qCard.className = 'card';
-    const backBtn2 = document.createElement('button');
-    backBtn2.className = 'back-toggle';
-    backBtn2.textContent = '↩';
-    backBtn2.onclick = renderHome;
+    const backBtn2 = createBackToggle(() => renderPlainStory(storyId, pathIndex));
     const topBarQ2 = document.createElement('div');
     topBarQ2.className = 'card-top-bar';
-    const bw2 = document.createElement('div'); bw2.className='card-top-bar-right'; bw2.appendChild(backBtn2);
-    topBarQ2.appendChild(bw2);
+    topBarQ2.appendChild(wrapBackToggle(backBtn2));
     qCard.appendChild(topBarQ2);
     const badge2 = document.createElement('div');
     badge2.className = 'badge';
@@ -30247,13 +31057,8 @@ function renderScene(sceneId){
   card.className = 'card';
 
 
-  const backBtn = document.createElement('button');
-  backBtn.className = 'back-toggle';
-  backBtn.textContent = '↩';
   const canStepBack = state.historyStack.length > 1;
-  backBtn.setAttribute('aria-label', canStepBack ? 'Go back one scene' : 'Back to library');
-  backBtn.title = canStepBack ? 'رجوع خطوة للخلف — Previous scene' : 'رجوع للمكتبة — Back to library';
-  backBtn.onclick = () => {
+  const backBtn = createBackToggle(() => {
     if(state.historyStack.length > 1){
       state.historyStack.pop();
       persist();
@@ -30261,7 +31066,10 @@ function renderScene(sceneId){
     } else {
       renderHome();
     }
-  };
+  }, {
+    ariaLabel: canStepBack ? 'Go back one scene' : 'Back to library',
+    title: canStepBack ? 'رجوع خطوة للخلف — Previous scene' : 'رجوع للمكتبة — Back to library'
+  });
 
   const hwBtn = document.createElement('button');
   hwBtn.className = 'hard-words-icon-btn';
@@ -30409,12 +31217,6 @@ function renderScene(sceneId){
         renderScene('start');
       };
       card.appendChild(restartLocked);
-
-      const homeBtnLocked = document.createElement('button');
-      homeBtnLocked.className = 'home-btn';
-      homeBtnLocked.textContent = '🏠 المكتبة';
-      homeBtnLocked.onclick = renderHome;
-      card.appendChild(homeBtnLocked);
 
       card.appendChild(hwPanel);
       app.appendChild(card);
@@ -30595,12 +31397,6 @@ function renderScene(sceneId){
     };
     card.appendChild(reviewBtn);
     card.appendChild(reviewPanel);
-
-    const homeBtn = document.createElement('button');
-    homeBtn.className = 'home-btn';
-    homeBtn.textContent = '🏠 المكتبة';
-    homeBtn.onclick = renderHome;
-    card.appendChild(homeBtn);
   } else {
     const hasQuestions = Array.isArray(scene.questions) && scene.questions.length > 0;
     const compPassed = hasQuestions ? isComprehensionPassed(currentStoryId, sceneId) : true;
@@ -30671,12 +31467,6 @@ function renderScene(sceneId){
     });
     card.appendChild(choicesDiv);
     }
-
-    const homeBtn = document.createElement('button');
-    homeBtn.className = 'home-btn';
-    homeBtn.textContent = '🏠 المكتبة';
-    homeBtn.onclick = renderHome;
-    card.appendChild(homeBtn);
   }
 
   card.appendChild(hwPanel);
@@ -30696,6 +31486,98 @@ document.addEventListener('click', () => {
 const STORIES = JSON.parse(document.getElementById('stories-data').textContent);
 const WORD_TRANSLATIONS = JSON.parse(document.getElementById('translations-data').textContent);
 renderHome();
+
+/* =====================================================================
+     [MISSING TRANSLATIONS CHECKER] — أداة فحص دائمة
+     الهدف: منع تكرار مشكلة "؟" عند إضافة قصة جديدة. تفحص كل نصوص
+     STORIES وتقارنها بـ WORD_TRANSLATIONS بنفس منطق البحث المستخدم
+     فعلياً عند الضغط على كلمة (قاموس مباشر + أرقام + ملكية 's +
+     وحدات قياس + اختصارات CONTRACTIONS + اشتقاق صرفي stemFallback).
+     الاستخدام: استدعِ checkMissingTranslations() من console المتصفح
+     بعد إضافة أي قصة جديدة، أو اضغط زر "🔍 فحص الترجمات" في وضع المالك.
+     ===================================================================== */
+const DIAG_CONTRACTIONS = new Set([
+  "wasn't","weren't","aren't","isn't","can't","couldn't","don't","doesn't",
+  "didn't","won't","wouldn't","shouldn't","hasn't","haven't","hadn't",
+  "i'm","it's","that's","there's","he's","she's","we're","they're","you're","i've",
+  "i'll","he'll","she'll","we'll","they'll","let's"
+]);
+function diagStemFallback(key){
+  const has = base => !!WORD_TRANSLATIONS[base];
+  if(/ing$/.test(key)){
+    const s = key.slice(0,-3);
+    if(has(s) || has(s+'e')) return true;
+    if(/(.)\1$/.test(s) && has(s.slice(0,-1))) return true;
+  }
+  if(/ed$/.test(key)){
+    if(has(key.slice(0,-2)) || has(key.slice(0,-1))) return true;
+    if(/(.)\1ed$/.test(key) && has(key.slice(0,-3))) return true;
+  }
+  if(/er$/.test(key) && has(key.slice(0,-2))) return true;
+  if(/est$/.test(key) && has(key.slice(0,-3))) return true;
+  if(/ly$/.test(key) && has(key.slice(0,-2))) return true;
+  if(/ies$/.test(key) && has(key.slice(0,-3)+'y')) return true;
+  if(/es$/.test(key) && has(key.slice(0,-2))) return true;
+  if(/s$/.test(key) && has(key.slice(0,-1))) return true;
+  return false;
+}
+function diagLookup(key){
+  if(WORD_TRANSLATIONS[key]) return true;
+  if(/^\d{1,4}$/.test(key)) return true;
+  const poss = key.match(/^([a-z]+)'s$/);
+  if(poss && WORD_TRANSLATIONS[poss[1]]) return true;
+  if(/^\d+(cm|m|kg|km|mm)$/.test(key)) return true;
+  if(DIAG_CONTRACTIONS.has(key)) return true;
+  if(diagStemFallback(key)) return true;
+  return false;
+}
+function diagCleanWord(tok){
+  const t = tok.replace(/^['"]+|['"]+$/g, '').replace(/^[^a-zA-Z0-9']+|[^a-zA-Z0-9']+$/g, '');
+  return (t || tok).toLowerCase();
+}
+function checkMissingTranslations(){
+  const missing = {}; // word -> {count, stories:Set}
+  function scanText(text, storyId){
+    if(!text) return;
+    text.split(/(\s+)/).forEach(tok => {
+      if(!tok || !tok.trim()) return;
+      const key = diagCleanWord(tok);
+      if(!key || !/^[a-z]/.test(key)) return;
+      if(!diagLookup(key)){
+        if(!missing[key]) missing[key] = { count: 0, stories: new Set() };
+        missing[key].count++;
+        missing[key].stories.add(storyId);
+      }
+    });
+  }
+  Object.entries(STORIES).forEach(([storyId, story]) => {
+    const scenes = story.scenes || {};
+    Object.values(scenes).forEach(scene => {
+      (scene.lines || []).forEach(l => scanText(l.en, storyId));
+      (scene.questions || []).forEach(q => {
+        scanText(q.en, storyId);
+        (q.options || []).forEach(o => scanText(o, storyId));
+      });
+      (scene.choices || []).forEach(c => scanText(c.en, storyId));
+    });
+  });
+  const rows = Object.entries(missing)
+    .map(([word, info]) => ({ word, count: info.count, stories: [...info.stories].join(', ') }))
+    .sort((a,b) => b.count - a.count);
+
+  if(rows.length === 0){
+    console.log('%c✅ لا توجد كلمات ناقصة في القاموس — كل كلمات القصص مغطاة.', 'color:green;font-weight:bold');
+  } else {
+    console.log(`%c⚠️ يوجد ${rows.length} كلمة غير موجودة في translations-data:`, 'color:#c00;font-weight:bold');
+    if(typeof console.table === 'function'){
+      console.table(rows);
+    } else {
+      rows.forEach(r => console.log(`${r.word} — ${r.count}× — [${r.stories}]`));
+    }
+  }
+  return rows;
+}
+window.checkMissingTranslations = checkMissingTranslations;
 
 /* =====================================================================
      [CONFUSABLE WORDS LAB] — أداة "مختبر الفروقات" الخارجية
