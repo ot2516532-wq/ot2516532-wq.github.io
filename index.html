@@ -2993,6 +2993,23 @@
     0%, 100%{ box-shadow:0 0 0 0 rgba(214,69,69,0.55); }
     50%{ box-shadow:0 0 0 4px rgba(214,69,69,0); }
   }
+
+  /* ---- SHARE STORY BUTTON (نهاية القصة فقط — بنفس حجم/تناسق restart-btn) ---- */
+  .share-cta-btn{
+    background:linear-gradient(135deg, var(--terracotta), var(--accent-2));
+    display:flex; align-items:center; justify-content:center; gap:8px;
+  }
+  .share-cta-btn svg{ width:18px; height:18px; flex-shrink:0; }
+
+  /* ---- APP TOAST (تنبيه قصير أسفل الشاشة) ---- */
+  .app-toast{
+    position:fixed; left:50%; bottom:calc(96px + env(safe-area-inset-bottom));
+    transform:translateX(-50%) translateY(12px); z-index:4000;
+    background:var(--ink); color:#fff; font-family:Tahoma,sans-serif; font-size:13px;
+    padding:9px 18px; border-radius:999px; box-shadow:0 6px 18px rgba(0,0,0,0.25);
+    opacity:0; pointer-events:none; transition:opacity .25s var(--ease), transform .25s var(--ease);
+  }
+  .app-toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
   .hw-item-due{
     font-size:11px;
     color:#d64545;
@@ -25831,6 +25848,60 @@ function wrapBackToggle(btn){
 }
 
 /* =====================================================================
+     APP TOAST + SHARE STORY (تنبيه قصير + مشاركة القصة)
+     showAppToast: رسالة عائمة قصيرة تختفي تلقائياً — لا تُعطّل أي تفاعل.
+     buildShareStoryBtn: زر "شارك" يستخدم Web Share API إن توفر
+     (يفتح قائمة المشاركة الأصلية بالجهاز: واتساب/تويتر/نسخ...)،
+     وإلا ينسخ رابط الموقع تلقائياً للحافظة كحل بديل.
+     دوال: showAppToast, shareStory, buildShareStoryBtn
+     ===================================================================== */
+function showAppToast(msg){
+  let toast = document.getElementById('app-toast');
+  if(!toast){
+    toast = document.createElement('div');
+    toast.id = 'app-toast';
+    toast.className = 'app-toast';
+    document.body.appendChild(toast);
+  }
+  toast.textContent = msg;
+  toast.classList.add('show');
+  clearTimeout(toast._hideTimer);
+  toast._hideTimer = setTimeout(() => toast.classList.remove('show'), 2200);
+}
+
+function shareStory(story){
+  const shareTitle = (story.title_ar || story.title) + ' 📖';
+  const shareText = 'جرّب قصة "' + (story.title_ar || story.title) + '" على تطبيق تعلّم اللغة بالقصص التفاعلية!';
+  const shareUrl = location.origin + location.pathname;
+
+  if(navigator.share){
+    navigator.share({ title: shareTitle, text: shareText, url: shareUrl }).catch(() => {});
+  } else if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(shareUrl)
+      .then(() => showAppToast('تم نسخ رابط الموقع ✔ شاركه مع أصدقائك'))
+      .catch(() => showAppToast(shareUrl));
+  } else {
+    showAppToast(shareUrl);
+  }
+}
+
+function buildShareStoryBtn(story){
+  const shareBtn = document.createElement('button');
+  shareBtn.type = 'button';
+  shareBtn.className = 'restart-btn share-cta-btn';
+  shareBtn.setAttribute('aria-label', 'شارك هذه القصة');
+  shareBtn.title = 'شارك هذه القصة — Share this story';
+  shareBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">' +
+    '<circle cx="18" cy="5" r="2.6" stroke="currentColor" stroke-width="1.8"/>' +
+    '<circle cx="6" cy="12" r="2.6" stroke="currentColor" stroke-width="1.8"/>' +
+    '<circle cx="18" cy="19" r="2.6" stroke="currentColor" stroke-width="1.8"/>' +
+    '<path d="M8.2 10.7 15.8 6.3M8.2 13.3 15.8 17.7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>' +
+    '</svg><span>شارك القصة — Share Story</span>';
+  shareBtn.onclick = () => shareStory(story);
+  return shareBtn;
+}
+
+/* =====================================================================
      WORD TAP PREFERENCES (تفضيل الضغط على الكلمة)
      يتحكم فيما يحدث عند الضغط على كلمة داخل القصة:
      صوت فقط | معنى فقط | كلاهما | كلاهما متوقف.
@@ -30561,6 +30632,22 @@ function buildWordSpans(text){
      ===================================================================== */
 const app = document.getElementById('app');
 
+/* =====================================================================
+     SUGGEST BAR VISIBILITY (إظهار شريط الاقتراحات بالشاشة الرئيسية فقط)
+     يراقب أي تغيير على محتوى #app؛ الشاشة الرئيسية هي الوحيدة التي تحوي
+     عنصر .home-bottom-nav — نعتمد عليه كعلامة مميزة بدل تعديل كل دالة
+     عرض شاشة بالملف (renderScene/renderPlainStory/...) يدوياً.
+     ===================================================================== */
+const suggestBarEl = document.getElementById('suggestBar');
+if(suggestBarEl){
+  const suggestBarObserver = new MutationObserver(() => {
+    const isHome = !!app.querySelector(':scope > .card > .home-bottom-nav, :scope > .card .home-bottom-nav');
+    suggestBarEl.style.display = isHome ? 'flex' : 'none';
+  });
+  suggestBarObserver.observe(app, { childList:true });
+  suggestBarEl.style.display = 'none';
+}
+
 /* ===== SECTION: 19. الصفحة الرئيسية (Home) ===== */
 function renderHome(){
   currentStoryId = null;
@@ -32614,6 +32701,7 @@ function renderPlainStory(storyId, pathIndex){
   actionRow.appendChild(markReadBtn);
   actionRow.appendChild(quizBtn);
   card.appendChild(actionRow);
+  card.appendChild(buildShareStoryBtn(story));
 
   /* ---- HARD WORDS ICON BUTTON + PANEL — same as interactive mode ---- */
   const hwBtn = document.createElement('button');
@@ -33362,6 +33450,7 @@ function renderScene(sceneId){
       renderScene('start');
     };
     card.appendChild(restart);
+    card.appendChild(buildShareStoryBtn(story));
 
     /* ---- REVIEW BUTTON ---- */
     const reviewBtn = document.createElement('button');
