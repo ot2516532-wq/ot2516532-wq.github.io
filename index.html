@@ -1291,34 +1291,6 @@
     font-family:'Tajawal','Tahoma',sans-serif;
   }
 
-  .sticky-close-btn{
-    position:fixed;
-    bottom:152px;
-    right:20px;
-    background:var(--card-bg);
-    color:var(--ink);
-    border:1.5px solid var(--line);
-    border-radius:50%;
-    width:42px;
-    height:42px;
-    font-size:18px;
-    cursor:pointer;
-    box-shadow:0 2px 12px rgba(0,0,0,0.18);
-    z-index:999;
-    transition:box-shadow .2s, transform .15s;
-    display:none;
-    align-items:center;
-    justify-content:center;
-    line-height:1;
-  }
-  .sticky-close-btn:hover{
-    box-shadow:0 4px 18px rgba(0,0,0,0.26);
-    transform:scale(1.08);
-  }
-  @media (min-width:600px){
-    .sticky-close-btn{ bottom:170px; }
-  }
-
   .level-close-btn{ display:none; }
 
   /* ---- [STORY GRID/CARDS] ---- */
@@ -1612,6 +1584,13 @@
   .story-icon{
     font-size:22px;
     flex-shrink:0;
+  }
+
+  /* ---- [ENDING EXTRAS] تجميع بصري لخيارات المراجعة المرجعية (جمل القصة/التراكيب) بنهاية القصة ---- */
+  .ending-extras{
+    margin-top:22px;
+    padding-top:18px;
+    border-top:1px dashed var(--line);
   }
 
   /* ---- [REVIEW PANEL] ---- */
@@ -3959,6 +3938,93 @@
   #suggestSend:hover{ transform:translateY(-1px); opacity:.92; }
   #suggestCancel{ background:var(--soft); color:var(--ink); }
   #suggestCancel:hover{ background:var(--line); }
+
+  /* ===== [CLOUD ACCOUNT UI] زر عائم + نافذة تسجيل الدخول/الخروج ===== */
+  #accountBtn{
+    position:fixed; top:8px; right:8px; z-index:999997;
+    display:flex; align-items:center; gap:5px;
+    padding:5px 11px; border-radius:999px;
+    border:1.5px solid var(--line); background:var(--card-bg);
+    box-shadow:0 2px 8px rgba(46,42,94,0.12);
+    color:#8b88a8; font-family:Tahoma,sans-serif; font-size:11px; font-weight:700;
+    cursor:pointer; opacity:.92;
+  }
+  #accountBtn:active{ opacity:1; }
+  #accountBtn.is-synced{ color:#1e9e5a; border-color:#1e9e5a66; opacity:1; }
+  #accountOverlay{
+    display:none; position:fixed; inset:0; background:rgba(20,18,40,.55);
+    backdrop-filter:blur(3px); -webkit-backdrop-filter:blur(3px);
+    z-index:9999; align-items:center; justify-content:center; padding:20px; box-sizing:border-box;
+  }
+  #accountModal{
+    background:var(--card-bg); border:1px solid var(--line); border-radius:var(--radius-lg);
+    padding:24px; width:100%; max-width:380px; box-shadow:var(--shadow-card-hover);
+    font-family:Tahoma,sans-serif; direction:rtl; text-align:right;
+    animation:screenFadeIn .22s var(--ease);
+  }
+  #accountModal h3{ margin:0 0 4px; font-size:17px; color:var(--ink); font-weight:700; }
+  #accountModal label{ display:block; font-size:12px; color:#8b88a8; margin-bottom:4px; }
+  #accountModal input{
+    width:100%; box-sizing:border-box; margin-bottom:14px; padding:10px 12px;
+    border:1.5px solid var(--line); border-radius:var(--radius-sm); font-family:inherit;
+    font-size:14px; color:var(--ink); background:var(--soft);
+    transition:border-color .2s var(--ease);
+  }
+  #accountModal input:focus{ outline:none; border-color:var(--terracotta); background:var(--card-bg); }
+  #accountActions{ display:flex; flex-wrap:wrap; gap:10px; }
+  #accountActions button{
+    flex:1; min-width:120px; border:none; border-radius:var(--radius-sm); padding:10px 14px;
+    cursor:pointer; font-family:inherit; font-size:13px; font-weight:600;
+    transition:transform .15s var(--ease), opacity .15s var(--ease);
+  }
+  #accountLoginBtn{ background:linear-gradient(135deg, var(--terracotta), var(--accent-2)); color:#fff; }
+  #accountLoginBtn:hover{ transform:translateY(-1px); opacity:.92; }
+  #accountSignupBtn{ background:var(--soft); color:var(--ink); }
+  #accountSignupBtn:hover{ background:var(--line); }
+  #accountLogoutBtn{ background:var(--soft); color:var(--ink); width:100%; }
+  #accountLogoutBtn:hover{ background:var(--line); }
+  #accountStatus{ margin:-6px 0 10px; font-size:12.5px; min-height:16px; }
+  #accountStatus.success{ color:#1e9e5a; font-weight:700; }
+  #accountStatus.error{ color:#d64545; font-weight:700; }
+  #accountEmailLabel{ font-weight:700; color:var(--ink); margin-bottom:2px; }
+  #accountCloseRow{ margin-top:16px; text-align:center; }
+  #accountCloseBtn{
+    border:none; background:transparent; color:#8b88a8; font-family:inherit;
+    font-size:12.5px; cursor:pointer; text-decoration:underline;
+  }
+
+  /* ===== [SYNC SUCCESS TOAST] تأكيد بصري متحرك عند نجاح تسجيل الدخول ===== */
+  #syncSuccessOverlay{
+    display:none; position:fixed; inset:0; z-index:10000;
+    align-items:center; justify-content:center;
+    background:rgba(20,18,40,.45);
+    backdrop-filter:blur(2px); -webkit-backdrop-filter:blur(2px);
+  }
+  #syncSuccessOverlay.show{ display:flex; animation:syncFadeIn .2s var(--ease); }
+  #syncSuccessCard{
+    background:var(--card-bg); border-radius:var(--radius-lg);
+    padding:30px 34px; box-shadow:var(--shadow-card-hover);
+    display:flex; flex-direction:column; align-items:center; gap:6px;
+    font-family:Tahoma,sans-serif; direction:rtl;
+    animation:syncCardPop .32s var(--ease);
+  }
+  #syncSuccessCheck{ width:64px; height:64px; margin-bottom:6px; }
+  #syncSuccessCircle{
+    stroke:#1e9e5a; stroke-width:2.5;
+    stroke-dasharray:145; stroke-dashoffset:145;
+    animation:syncCircleDraw .45s var(--ease) forwards;
+  }
+  #syncSuccessTick{
+    stroke:#1e9e5a; stroke-width:3.5; stroke-linecap:round; stroke-linejoin:round;
+    stroke-dasharray:34; stroke-dashoffset:34;
+    animation:syncTickDraw .3s var(--ease) .4s forwards;
+  }
+  #syncSuccessText{ font-size:15.5px; font-weight:800; color:var(--ink); }
+  #syncSuccessSub{ font-size:12.5px; color:#8b88a8; }
+  @keyframes syncFadeIn{ from{ opacity:0; } to{ opacity:1; } }
+  @keyframes syncCardPop{ from{ transform:scale(.85); opacity:0; } to{ transform:scale(1); opacity:1; } }
+  @keyframes syncCircleDraw{ to{ stroke-dashoffset:0; } }
+  @keyframes syncTickDraw{ to{ stroke-dashoffset:0; } }
 </style>
 <!-- ===== END SECTION: Styles ===== -->
 </head>
@@ -3966,6 +4032,95 @@
 <noscript><div style="text-align:center;padding:40px;font-family:Tahoma,sans-serif;direction:rtl;font-size:16px;color:#555;">يتطلب هذا التطبيق تفعيل JavaScript في متصفحك.<br>This app requires JavaScript to be enabled.</div></noscript>
 
 <div class="wrap" id="app"></div>
+
+<!-- ===== SECTION: Cloud Sync (Firebase) — مزامنة التقدم عبر الأجهزة ===== -->
+<!--
+  خطوات التفعيل (مرة واحدة فقط، مجانية بالكامل):
+  1) افتح https://console.firebase.google.com وأنشئ مشروعاً جديداً (Add project).
+  2) من القائمة الجانبية: Build → Authentication → Get started → فعّل مزوّد
+     "Email/Password".
+  3) من القائمة الجانبية: Build → Firestore Database → Create database
+     (ابدأ بوضع Test mode مبدئياً، ثم يمكن تشديد القواعد لاحقاً).
+  4) من إعدادات المشروع (⚙️ Project settings) → أسفل الصفحة "Your apps" →
+     أضف تطبيق ويب (</>) وانسخ كائن firebaseConfig الذي يظهر لك.
+  5) الصق القيم الستة بالأسفل مكان النصوص REPLACE_ME.
+  ما لم تُستبدل هذه القيم، تبقى ميزة المزامنة السحابية معطّلة تلقائياً
+  ويعمل التطبيق بشكل طبيعي كالمعتاد بدون أي تأثير.
+-->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyDf5jF0miP0egDbytDucIeq8oQeDkO2GAo",
+    authDomain: "sajjad-5970d.firebaseapp.com",
+    projectId: "sajjad-5970d",
+    storageBucket: "sajjad-5970d.firebasestorage.app",
+    messagingSenderId: "851258623624",
+    appId: "1:851258623624:web:0da52a0e4d8024dfa8013d"
+  };
+  const CLOUD_SYNC_CONFIGURED = Object.values(firebaseConfig).every(v => v && v !== 'REPLACE_ME');
+  if(CLOUD_SYNC_CONFIGURED){
+    try{
+      firebase.initializeApp(firebaseConfig);
+      window.firebaseAuth = firebase.auth();
+      window.firebaseDb = firebase.firestore();
+    }catch(e){ console.warn('Cloud sync init failed:', e); }
+  }
+</script>
+<!-- ===== END SECTION: Cloud Sync (Firebase) ===== -->
+
+<!-- ===== SECTION: Cloud Account UI (زر + نافذة تسجيل الدخول/الخروج) ===== -->
+<button id="accountBtn" type="button" aria-label="حسابي ومزامنة التقدم" style="display:none;">
+  <svg id="accountBtnIcon" viewBox="0 0 24 24" width="14" height="14" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <path d="M7 18.5a4.5 4.5 0 0 1-.4-8.98 5.5 5.5 0 0 1 10.7-1.46A4 4 0 0 1 17 18.5H7Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+  <span id="accountBtnLabel">مزامنة</span>
+</button>
+<div id="accountOverlay">
+  <div id="accountModal">
+    <h3>☁️ مزامنة التقدم عبر الأجهزة</h3>
+    <p class="suggest-sub">سجّل بإيميلك مرة واحدة، وتقدمك (كلماتك الصعبة، القصص المكتملة، مستواك...) يظهر تلقائياً بأي جهاز آخر تسجّل فيه بنفس الحساب.</p>
+
+    <div id="accountLoggedOut">
+      <label for="accountEmail">الإيميل</label>
+      <input id="accountEmail" type="email" placeholder="example@email.com" autocomplete="email">
+      <label for="accountPassword">كلمة المرور</label>
+      <input id="accountPassword" type="password" placeholder="6 أحرف على الأقل" autocomplete="current-password">
+      <p id="accountStatus"></p>
+      <div id="accountActions">
+        <button id="accountLoginBtn" type="button">تسجيل الدخول</button>
+        <button id="accountSignupBtn" type="button">إنشاء حساب جديد</button>
+      </div>
+    </div>
+
+    <div id="accountLoggedIn" style="display:none;">
+      <p id="accountEmailLabel" class="suggest-sub"></p>
+      <p id="accountSyncStatus" class="suggest-sub"></p>
+      <div id="accountActions">
+        <button id="accountLogoutBtn" type="button">تسجيل الخروج من هذا الجهاز</button>
+      </div>
+    </div>
+
+    <div id="accountCloseRow">
+      <button id="accountCloseBtn" type="button">إغلاق</button>
+    </div>
+  </div>
+</div>
+<!-- ===== END SECTION: Cloud Account UI ===== -->
+
+<!-- ===== SECTION: Sync Success Toast (تأكيد بصري متحرك عند تسجيل الدخول) ===== -->
+<div id="syncSuccessOverlay">
+  <div id="syncSuccessCard">
+    <svg id="syncSuccessCheck" viewBox="0 0 52 52">
+      <circle id="syncSuccessCircle" cx="26" cy="26" r="23" fill="none"/>
+      <path id="syncSuccessTick" fill="none" d="M14 27l7 7 17-17"/>
+    </svg>
+    <div id="syncSuccessText">تم تسجيل الدخول بنجاح</div>
+    <div id="syncSuccessSub">جارِ مزامنة تقدمك...</div>
+  </div>
+</div>
+<!-- ===== END SECTION: Sync Success Toast ===== -->
 
 <!-- ===== SECTION: Suggestion Bar (mailto) ===== -->
 <div id="suggestBar">
@@ -26636,7 +26791,7 @@ const STORY_PHRASAL_SRS_KEY = 'storyPhrasalVerbsSRS_v1';
 function srsToday(){ return new Date().toISOString().slice(0,10); }
 function srsDaysFromNow(n){ const d = new Date(); d.setDate(d.getDate()+n); return d.toISOString().slice(0,10); }
 function loadKeyedSRS(key){ try{ return JSON.parse(localStorage.getItem(key)) || {}; }catch(e){ return {}; } }
-function saveKeyedSRS(key, s){ try{ localStorage.setItem(key, JSON.stringify(s)); }catch(e){} }
+function saveKeyedSRS(key, s){ try{ localStorage.setItem(key, JSON.stringify(s)); }catch(e){} scheduleCloudSync(); }
 function getSRSState(store, id){ return store[id] || { box:0, due: srsToday() }; }
 function recordSRSResult(key, id, wasCorrect){
   const store = loadKeyedSRS(key);
@@ -26699,7 +26854,12 @@ function renderMandatoryStoryReview(card, story){
   const pairs = pickPriorityItems(pairsAll, STORY_CONFUSABLE_SRS_KEY, g=>g.id, cap.pairs);
   const verbs = pickPriorityItems(verbsAll, STORY_PHRASAL_SRS_KEY, p=>p.en, cap.verbs);
 
-  if(!pairs.length && !verbs.length) return;
+  /* ---- مفردات القصة (بطاقات تعلّم + اختيار من متعدد) — مدمجة هنا كخطوات
+     إجبارية بعد الفروقات/الأفعال المركبة، بدل قسم منفصل قابل للتخطي ---- */
+  const vocabWords = getStoryVocabWords(story);
+  const vocabStages = vocabWords.length >= 2 ? ['flashcard', 'mcq'].filter(examAllowed) : [];
+
+  if(!pairs.length && !verbs.length && !vocabStages.length) return;
 
   const steps = [];
   const maxLen = Math.max(pairs.length, verbs.length);
@@ -26707,6 +26867,7 @@ function renderMandatoryStoryReview(card, story){
     if(pairs[i]) steps.push({ type:'pair', data: pairs[i] });
     if(verbs[i]) steps.push({ type:'verb', data: verbs[i] });
   }
+  vocabStages.forEach(mode => steps.push({ type:'vocab', data: mode }));
 
   const wrap = document.createElement('div');
   wrap.className = 'story-practice-wrap mrv-wrap';
@@ -26747,7 +26908,29 @@ function renderMandatoryStoryReview(card, story){
     body.appendChild(progressLabel());
     const step = steps[idx];
     if(step.type === 'pair') renderPairStep(step.data);
-    else renderVerbStep(step.data);
+    else if(step.type === 'verb') renderVerbStep(step.data);
+    else renderVocabStage(step.data);
+  }
+
+  function renderVocabStage(mode){
+    const stageTitles = { flashcard: '🗂️ بطاقات تعلّم — مفردات هذه القصة', mcq: '🧪 اختيار من متعدد — مفردات هذه القصة' };
+    const stageLabel = document.createElement('div');
+    stageLabel.className = 'story-practice-stage-label';
+    stageLabel.style.display = 'flex';
+    stageLabel.textContent = stageTitles[mode];
+    body.appendChild(stageLabel);
+
+    const stageBody = document.createElement('div');
+    body.appendChild(stageBody);
+
+    runExercise({
+      card: stageBody,
+      words: vocabWords,
+      mode,
+      questionCount: levelQuestionCount(),
+      backAction: () => { idx++; renderStep(); },
+      backLabel: (idx === steps.length - 1) ? '✅ إنهاء المراجعة' : '➡ متابعة'
+    });
   }
 
   function renderPairStep(g){
@@ -26971,6 +27154,7 @@ function loadProgress(){
 }
 function saveProgress(progress){
   try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(progress)); }catch(e){}
+  scheduleCloudSync();
 }
 let PROGRESS = loadProgress();
 
@@ -27002,6 +27186,7 @@ function loadHardWords(){
 }
 function saveHardWords(){
   try{ localStorage.setItem(HARD_WORDS_KEY, JSON.stringify(HARD_WORDS)); }catch(e){}
+  scheduleCloudSync();
 }
 let HARD_WORDS = loadHardWords();
 
@@ -27018,6 +27203,7 @@ function loadAutoAdded(){
 }
 function saveAutoAdded(){
   try{ localStorage.setItem(AUTO_ADDED_KEY, JSON.stringify(AUTO_ADDED)); }catch(e){}
+  scheduleCloudSync();
 }
 let AUTO_ADDED = loadAutoAdded();
 function isAutoAdded(word){ return !!AUTO_ADDED[word]; }
@@ -27062,6 +27248,7 @@ function loadStreak(){
 }
 function saveStreak(){
   try{ localStorage.setItem(STREAK_KEY, JSON.stringify(STREAK_DATA)); }catch(e){}
+  scheduleCloudSync();
 }
 let STREAK_DATA = loadStreak();
 function recordStreakActivity(){
@@ -27089,8 +27276,177 @@ function loadSRS(){
 }
 function saveSRS(){
   try{ localStorage.setItem(SRS_KEY, JSON.stringify(SRS_DATA)); }catch(e){}
+  scheduleCloudSync();
 }
 let SRS_DATA = loadSRS();
+
+/* =====================================================================
+     [CLOUD SYNC] مزامنة التقدم عبر الأجهزة (Firebase — اختيارية بالكامل)
+     تُجمع كل بيانات التقدم الفعلية (لا تشمل تفضيلات الجهاز مثل الصوت/الثيم)
+     في وثيقة واحدة بـ Firestore مرتبطة بحساب المستخدم، وتُرفع تلقائياً بعد
+     أي حفظ، وتُسحب عند تسجيل الدخول على جهاز جديد.
+     دوال: collectCloudPayload | applyCloudPayload | scheduleCloudSync |
+           pushCloudNow | pullCloudThenReload
+     ===================================================================== */
+const CLOUD_SYNC_KEYS = [
+  STORAGE_KEY, HARD_WORDS_KEY, AUTO_ADDED_KEY, LEARNED_KEY,
+  STREAK_KEY, SRS_KEY, STORY_CONFUSABLE_SRS_KEY, STORY_PHRASAL_SRS_KEY,
+  'comprehensionPassed', 'selectedLevel'
+];
+let cloudUser = null;
+let cloudSyncTimer = null;
+let cloudApplyingRemote = false;
+
+function collectCloudPayload(){
+  const data = {};
+  CLOUD_SYNC_KEYS.forEach(k => {
+    const v = localStorage.getItem(k);
+    if(v !== null) data[k] = v;
+  });
+  return data;
+}
+
+function applyCloudPayload(data){
+  if(!data) return;
+  CLOUD_SYNC_KEYS.forEach(k => {
+    if(typeof data[k] === 'string') localStorage.setItem(k, data[k]);
+  });
+}
+
+function scheduleCloudSync(){
+  if(cloudApplyingRemote || !cloudUser || !window.firebaseDb) return;
+  clearTimeout(cloudSyncTimer);
+  cloudSyncTimer = setTimeout(pushCloudNow, 1500);
+}
+
+function pushCloudNow(){
+  if(!cloudUser || !window.firebaseDb) return;
+  const payload = collectCloudPayload();
+  payload._updatedAt = Date.now();
+  window.firebaseDb.collection('progress').doc(cloudUser.uid).set(payload).catch(e => console.warn('Cloud push failed:', e));
+}
+
+function pullCloudThenReload(){
+  if(!cloudUser || !window.firebaseDb) return Promise.resolve();
+  return window.firebaseDb.collection('progress').doc(cloudUser.uid).get().then(doc => {
+    if(doc.exists){
+      cloudApplyingRemote = true;
+      applyCloudPayload(doc.data());
+      location.reload();
+    } else {
+      pushCloudNow();
+    }
+  }).catch(e => console.warn('Cloud pull failed:', e));
+}
+
+/* ---- [CLOUD ACCOUNT UI] ربط الواجهة (زر عائم + نافذة) بمصادقة Firebase ---- */
+function initCloudAccountUI(){
+  const btn = document.getElementById('accountBtn');
+  if(!CLOUD_SYNC_CONFIGURED || !window.firebaseAuth){
+    return; // الزر يبقى مخفياً (display:none الافتراضي) — لا تأثير على التطبيق
+  }
+  btn.style.display = 'flex';
+
+  const overlay = document.getElementById('accountOverlay');
+  const emailInput = document.getElementById('accountEmail');
+  const passInput = document.getElementById('accountPassword');
+  const statusEl = document.getElementById('accountStatus');
+  const loggedOutBox = document.getElementById('accountLoggedOut');
+  const loggedInBox = document.getElementById('accountLoggedIn');
+  const emailLabel = document.getElementById('accountEmailLabel');
+  const syncStatusEl = document.getElementById('accountSyncStatus');
+
+  function openModal(){ overlay.style.display = 'flex'; }
+  function closeModal(){ overlay.style.display = 'none'; statusEl.textContent = ''; statusEl.className=''; }
+  function showStatus(msg, ok){
+    statusEl.textContent = msg;
+    statusEl.className = ok ? 'success' : 'error';
+  }
+  function friendlyAuthError(code){
+    const map = {
+      'auth/invalid-email': 'صيغة الإيميل غير صحيحة',
+      'auth/email-already-in-use': 'هذا الإيميل مسجّل مسبقاً — جرّب تسجيل الدخول بدلاً من إنشاء حساب',
+      'auth/weak-password': 'كلمة المرور ضعيفة — استخدم 6 أحرف على الأقل',
+      'auth/user-not-found': 'لا يوجد حساب بهذا الإيميل',
+      'auth/wrong-password': 'كلمة المرور غير صحيحة',
+      'auth/invalid-credential': 'الإيميل أو كلمة المرور غير صحيحة',
+      'auth/network-request-failed': 'تحقق من اتصالك بالإنترنت'
+    };
+    return map[code] || 'حدث خطأ، حاول مرة أخرى';
+  }
+
+  btn.onclick = openModal;
+  document.getElementById('accountCloseBtn').onclick = closeModal;
+
+  let justSignedIn = false;
+
+  document.getElementById('accountSignupBtn').onclick = () => {
+    const email = emailInput.value.trim();
+    const pass = passInput.value;
+    if(!email || !pass){ showStatus('أدخل الإيميل وكلمة المرور', false); return; }
+    window.firebaseAuth.createUserWithEmailAndPassword(email, pass)
+      .then(() => { justSignedIn = true; showStatus('تم إنشاء الحساب! جارِ رفع تقدمك الحالي...', true); })
+      .catch(e => showStatus(friendlyAuthError(e.code), false));
+  };
+
+  document.getElementById('accountLoginBtn').onclick = () => {
+    const email = emailInput.value.trim();
+    const pass = passInput.value;
+    if(!email || !pass){ showStatus('أدخل الإيميل وكلمة المرور', false); return; }
+    showStatus('جارِ تسجيل الدخول...', true);
+    window.firebaseAuth.signInWithEmailAndPassword(email, pass)
+      .then(() => { justSignedIn = true; })
+      .catch(e => showStatus(friendlyAuthError(e.code), false));
+  };
+
+  document.getElementById('accountLogoutBtn').onclick = () => {
+    window.firebaseAuth.signOut();
+  };
+
+  function showSyncSuccessToast(callback){
+    const overlay = document.getElementById('syncSuccessOverlay');
+    const circle = document.getElementById('syncSuccessCircle');
+    const tick = document.getElementById('syncSuccessTick');
+    /* إعادة تشغيل الأنيميشن من الصفر في كل مرة */
+    circle.style.animation = 'none'; tick.style.animation = 'none';
+    void circle.offsetWidth;
+    circle.style.animation = ''; tick.style.animation = '';
+    overlay.classList.add('show');
+    setTimeout(() => {
+      overlay.classList.remove('show');
+      callback();
+    }, 1300);
+  }
+
+  window.firebaseAuth.onAuthStateChanged(user => {
+    cloudUser = user;
+    const btnLabel = document.getElementById('accountBtnLabel');
+    if(user){
+      btn.classList.add('is-synced');
+      btnLabel.textContent = 'متصل ✓';
+      loggedOutBox.style.display = 'none';
+      loggedInBox.style.display = 'block';
+      emailLabel.textContent = '✅ مسجّل الدخول: ' + user.email;
+      syncStatusEl.textContent = 'تقدمك يُزامن تلقائياً على كل جهاز تسجّل فيه بهذا الحساب.';
+      if(justSignedIn){
+        justSignedIn = false;
+        showSyncSuccessToast(() => pullCloudThenReload());
+      } else {
+        pullCloudThenReload();
+      }
+    } else {
+      btn.classList.remove('is-synced');
+      btnLabel.textContent = 'مزامنة';
+      loggedOutBox.style.display = 'block';
+      loggedInBox.style.display = 'none';
+    }
+  });
+}
+if(document.readyState === 'loading'){
+  document.addEventListener('DOMContentLoaded', initCloudAccountUI);
+} else {
+  initCloudAccountUI();
+}
 
 function srsGetRecord(word){
   const rec = SRS_DATA[word];
@@ -28824,6 +29180,7 @@ function loadLearnedWords(){
 }
 function saveLearnedWords(){
   try{ localStorage.setItem(LEARNED_KEY, JSON.stringify(LEARNED_WORDS)); }catch(e){}
+  scheduleCloudSync();
 }
 let LEARNED_WORDS = loadLearnedWords();
 
@@ -28958,6 +29315,7 @@ function runExercise(config){
   const questionCount = config.questionCount || levelQuestionCount();
   const perWordCategory = config.perWordCategory || null;
   const backAction = config.backAction || null;
+  const backLabel = config.backLabel || null;
 
   card.innerHTML = '';
 
@@ -29247,6 +29605,14 @@ function runExercise(config){
     again.onclick = () => { current = 0; score = 0; missed = []; renderQuestion(); };
     body.appendChild(again);
 
+    if(backAction){
+      const cont = document.createElement('button');
+      cont.className = 'quiz-btn';
+      cont.textContent = backLabel || '➡ متابعة';
+      cont.onclick = backAction;
+      body.appendChild(cont);
+    }
+
     if(!isCategory && missed.length){
       const box = document.createElement('div');
       box.className = 'dict-missed';
@@ -29317,6 +29683,14 @@ function runExercise(config){
         again.textContent = '↺ مراجعة جديدة';
         again.onclick = () => runExercise(config);
         card.appendChild(again);
+
+        if(backAction){
+          const cont = document.createElement('button');
+          cont.className = 'quiz-btn';
+          cont.textContent = backLabel || '➡ متابعة';
+          cont.onclick = backAction;
+          card.appendChild(cont);
+        }
         return;
       }
 
@@ -30001,6 +30375,7 @@ function getSelectedLevel(){
 function setSelectedLevel(lvl){
   CURRENT_LEVEL = lvl;
   try { localStorage.setItem('selectedLevel', lvl); } catch(e){}
+  scheduleCloudSync();
 }
 function clearSelectedLevel(){
   CURRENT_LEVEL = null;
@@ -31318,25 +31693,6 @@ function renderHome(){
     });
   }, { root:null, rootMargin:'-42% 0px -42% 0px', threshold:0 });
   levelsWrap.querySelectorAll('.level-box').forEach(box => levelScrollSpy.observe(box));
-
-  /* ---- STICKY CLOSE BAR ---- */
-  const stickyClose = document.createElement('button');
-  stickyClose.className = 'sticky-close-btn';
-  stickyClose.innerHTML = '✕';
-  stickyClose.title = 'Close level';
-  stickyClose.style.display = 'none';
-  stickyClose.onclick = () => {
-    levelsWrap.querySelectorAll('.level-section.open').forEach(s => s.classList.remove('open'));
-    stickyClose.style.display = 'none';
-  };
-  card.appendChild(stickyClose);
-
-  /* show/hide sticky button when any section opens/closes */
-  const observer = new MutationObserver(() => {
-    const anyOpen = levelsWrap.querySelector('.level-section.open');
-    stickyClose.style.display = anyOpen ? 'flex' : 'none';
-  });
-  observer.observe(levelsWrap, { attributes: true, subtree: true, attributeFilter: ['class'] });
 
   /* ---- HARD WORDS PANEL (wired to topBar btn) ---- */
   const hwPanel = document.createElement('div');
@@ -32745,6 +33101,7 @@ function loadComprehensionPassed(){
 }
 function saveComprehensionPassed(){
   try{ localStorage.setItem('comprehensionPassed', JSON.stringify(COMPREHENSION_PASSED)); }catch(e){}
+  scheduleCloudSync();
 }
 let COMPREHENSION_PASSED = loadComprehensionPassed();
 function compKey(storyId, sceneId){ return storyId + ':' + sceneId; }
@@ -33326,119 +33683,10 @@ function renderScene(sceneId){
       celebrateNewEnding(card, progBar);
     }
 
-    /* ---- MANDATORY STORY REVIEW (مراجعة إجبارية: فروقات + أفعال مركبة من هذه القصة) ---- */
+    /* ---- MANDATORY STORY REVIEW (مراجعة إجبارية موحّدة: فروقات + أفعال مركبة
+       + بطاقات تعلّم + اختيار من متعدد لمفردات القصة — كلها خطوات إجبارية
+       متسلسلة داخل renderMandatoryStoryReview، بلا تخطي) ---- */
     renderMandatoryStoryReview(card, story);
-
-    /* ---- STORY VOCAB PRACTICE (تمارين مفردات القصة — Practice this story's words) ---- */
-    const vocabWords = getStoryVocabWords(story);
-    if(vocabWords.length >= 2){
-      const practiceWrap = document.createElement('div');
-      practiceWrap.className = 'story-practice-wrap';
-
-      const practiceTitle = document.createElement('div');
-      practiceTitle.className = 'story-practice-title';
-      practiceTitle.textContent = '🧠 اختبر مفرداتك من هذه القصة';
-      practiceWrap.appendChild(practiceTitle);
-
-      const practiceSub = document.createElement('div');
-      practiceSub.className = 'story-practice-sub';
-      practiceSub.textContent = `${vocabWords.length} كلمة من هذه القصة — تمرين اختياري`;
-      practiceWrap.appendChild(practiceSub);
-
-      /* تسلسل التمارين المتاحة لمستوى المتعلم الحالي — الترتيب علمي وثابت
-         (بطاقات تعلّم أولاً للتعرّض على الكلمة، ثم اختيار من متعدد لاختبار
-         الاسترجاع) ويُبنى تلقائياً من EXERCISE_ACCESS دون أي اختيار يدوي
-         من المتعلم. صعوبة كل تمرين (عدد الخيارات، اتجاه الترجمة) تتكيف
-         تلقائياً مع CURRENT_LEVEL داخل runExercise/resolveQuizDirection. */
-      const stageOrder = ['flashcard', 'mcq'].filter(examAllowed);
-      const stageTitles = { flashcard: '🗂️ بطاقات تعلّم', mcq: '🧪 اختيار من متعدد' };
-
-      if(stageOrder.length){
-        const stageLabel = document.createElement('div');
-        stageLabel.className = 'story-practice-stage-label';
-
-        const practiceBody = document.createElement('div');
-        practiceBody.className = 'quiz-screen';
-
-        const startBtn = document.createElement('button');
-        startBtn.className = 'quiz-btn';
-        startBtn.textContent = '🧠 ابدأ الاختبار';
-
-        const skipLink = document.createElement('button');
-        skipLink.type = 'button';
-        skipLink.className = 'story-practice-skip';
-        skipLink.textContent = 'تخطي هذا التمرين';
-        skipLink.onclick = () => practiceWrap.remove();
-
-        function runStage(i){
-          practiceBody.innerHTML = '';
-          const mode = stageOrder[i];
-          const isLast = i === stageOrder.length - 1;
-          if(stageOrder.length > 1){
-            stageLabel.style.display = 'flex';
-            stageLabel.textContent = `التمرين ${i + 1} من ${stageOrder.length} — ${stageTitles[mode]}`;
-          }
-          runExercise({
-            card: practiceBody,
-            words: vocabWords,
-            mode,
-            questionCount: levelQuestionCount(),
-            backAction: () => (isLast ? finishSequence() : showTransition(i)),
-            backLabel: isLast ? '✅ إنهاء التمارين' : '➡ متابعة'
-          });
-        }
-
-        function showTransition(i){
-          practiceBody.innerHTML = '';
-          const nextMode = stageOrder[i + 1];
-          const box = document.createElement('div');
-          box.className = 'story-practice-transition';
-          const emoji = document.createElement('div');
-          emoji.className = 'story-practice-transition-emoji';
-          emoji.textContent = '🎉';
-          const label = document.createElement('div');
-          label.className = 'story-practice-transition-label';
-          label.textContent = `أحسنت! التمرين التالي: ${stageTitles[nextMode]}`;
-          box.appendChild(emoji);
-          box.appendChild(label);
-          practiceBody.appendChild(box);
-
-          const contBtn = document.createElement('button');
-          contBtn.className = 'quiz-btn';
-          contBtn.textContent = '➡ متابعة إلى التمرين التالي';
-          contBtn.onclick = () => runStage(i + 1);
-          practiceBody.appendChild(contBtn);
-
-          const skipToEnd = document.createElement('button');
-          skipToEnd.type = 'button';
-          skipToEnd.className = 'story-practice-skip';
-          skipToEnd.textContent = 'تخطي إلى النهاية';
-          skipToEnd.onclick = finishSequence;
-          practiceBody.appendChild(skipToEnd);
-        }
-
-        function finishSequence(){
-          practiceWrap.innerHTML = '';
-          const done = document.createElement('div');
-          done.className = 'story-practice-done';
-          done.innerHTML = '<span>✅</span><span>أكملت تمارين مفردات هذه القصة — أحسنت!</span>';
-          practiceWrap.appendChild(done);
-        }
-
-        startBtn.onclick = () => {
-          practiceSub.remove();
-          startBtn.remove();
-          skipLink.remove();
-          practiceWrap.appendChild(stageLabel);
-          practiceWrap.appendChild(practiceBody);
-          runStage(0);
-        };
-
-        practiceWrap.appendChild(startBtn);
-        practiceWrap.appendChild(skipLink);
-        card.appendChild(practiceWrap);
-      }
-    }
 
     const restart = document.createElement('button');
     restart.className = 'restart-btn';
@@ -33449,8 +33697,16 @@ function renderScene(sceneId){
       persist();
       renderScene('start');
     };
-    card.appendChild(restart);
-    card.appendChild(buildShareStoryBtn(story));
+    /* ---- ENDING ACTIONS ROW (تجميع أفقي: إعادة البدء + مشاركة، بدل تكديسهما عمودياً) ---- */
+    const endingActionsRow = document.createElement('div');
+    endingActionsRow.className = 'action-row';
+    endingActionsRow.appendChild(restart);
+    endingActionsRow.appendChild(buildShareStoryBtn(story));
+    card.appendChild(endingActionsRow);
+
+    /* ---- ENDING EXTRAS (مرجعية/اختيارية): مراجعة الجمل + مراجعة التراكيب — مجمّعة بصرياً بعيداً عن أزرار الإجراءات الأساسية ---- */
+    const endingExtrasWrap = document.createElement('div');
+    endingExtrasWrap.className = 'ending-extras';
 
     /* ---- REVIEW BUTTON ---- */
     const reviewBtn = document.createElement('button');
@@ -33483,17 +33739,19 @@ function renderScene(sceneId){
         reviewPanel.appendChild(hint);
       }
     };
-    card.appendChild(reviewBtn);
-    card.appendChild(reviewPanel);
+    endingExtrasWrap.appendChild(reviewBtn);
+    endingExtrasWrap.appendChild(reviewPanel);
 
     /* ---- مراجعة شاملة: كل تراكيب الجملة عبر القصة كاملة + تمرين علمي ---- */
     const storyPatterns = collectStructurePatternsFromStory(currentStoryId, state.historyStack);
     if(storyPatterns.length){
-      card.appendChild(buildStructurePanel(storyPatterns, {
+      endingExtrasWrap.appendChild(buildStructurePanel(storyPatterns, {
         title:'مراجعة تراكيب هذه القصة كاملة',
         intro:'هذه كل التراكيب النحوية التي ظهرت خلال رحلتك في هذه القصة — راجعها ثم اختبر نفسك فيها جميعاً:'
       }));
     }
+
+    card.appendChild(endingExtrasWrap);
   } else {
     const hasQuestions = Array.isArray(scene.questions) && scene.questions.length > 0;
     const compPassed = hasQuestions ? isComprehensionPassed(currentStoryId, sceneId) : true;
