@@ -3939,18 +3939,7 @@
   #suggestCancel{ background:var(--soft); color:var(--ink); }
   #suggestCancel:hover{ background:var(--line); }
 
-  /* ===== [CLOUD ACCOUNT UI] زر عائم + نافذة تسجيل الدخول/الخروج ===== */
-  #accountBtn{
-    position:fixed; top:8px; right:8px; z-index:999997;
-    display:flex; align-items:center; gap:5px;
-    padding:5px 11px; border-radius:999px;
-    border:1.5px solid var(--line); background:var(--card-bg);
-    box-shadow:0 2px 8px rgba(46,42,94,0.12);
-    color:#8b88a8; font-family:Tahoma,sans-serif; font-size:11px; font-weight:700;
-    cursor:pointer; opacity:.92;
-  }
-  #accountBtn:active{ opacity:1; }
-  #accountBtn.is-synced{ color:#1e9e5a; border-color:#1e9e5a66; opacity:1; }
+  /* ===== [CLOUD ACCOUNT UI] النافذة المنبثقة (الزر أصبح صفاً داخل قائمة الإعدادات) ===== */
   #accountOverlay{
     display:none; position:fixed; inset:0; background:rgba(20,18,40,.55);
     backdrop-filter:blur(3px); -webkit-backdrop-filter:blur(3px);
@@ -3962,7 +3951,15 @@
     font-family:Tahoma,sans-serif; direction:rtl; text-align:right;
     animation:screenFadeIn .22s var(--ease);
   }
-  #accountModal h3{ margin:0 0 4px; font-size:17px; color:var(--ink); font-weight:700; }
+  #accountModalHead{ display:flex; align-items:flex-start; justify-content:space-between; gap:10px; margin-bottom:4px; }
+  #accountModal h3{ margin:0; font-size:17px; color:var(--ink); font-weight:700; }
+  #accountXBtn{
+    border:none; background:var(--soft); color:var(--ink);
+    width:26px; height:26px; min-width:26px; border-radius:50%;
+    font-size:13px; cursor:pointer; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+  }
+  #accountXBtn:hover{ background:var(--line); }
   #accountModal label{ display:block; font-size:12px; color:#8b88a8; margin-bottom:4px; }
   #accountModal input{
     width:100%; box-sizing:border-box; margin-bottom:14px; padding:10px 12px;
@@ -4070,16 +4067,13 @@
 </script>
 <!-- ===== END SECTION: Cloud Sync (Firebase) ===== -->
 
-<!-- ===== SECTION: Cloud Account UI (زر + نافذة تسجيل الدخول/الخروج) ===== -->
-<button id="accountBtn" type="button" aria-label="حسابي ومزامنة التقدم" style="display:none;">
-  <svg id="accountBtnIcon" viewBox="0 0 24 24" width="14" height="14" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <path d="M7 18.5a4.5 4.5 0 0 1-.4-8.98 5.5 5.5 0 0 1 10.7-1.46A4 4 0 0 1 17 18.5H7Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-  </svg>
-  <span id="accountBtnLabel">مزامنة</span>
-</button>
+<!-- ===== SECTION: Cloud Account UI (نافذة تسجيل الدخول/الخروج — الزر نفسه يُبنى داخل الشريط السفلي بالشاشة الرئيسية فقط) ===== -->
 <div id="accountOverlay">
   <div id="accountModal">
-    <h3>☁️ مزامنة التقدم عبر الأجهزة</h3>
+    <div id="accountModalHead">
+      <h3>☁️ مزامنة التقدم عبر الأجهزة</h3>
+      <button id="accountXBtn" type="button" aria-label="إغلاق">✕</button>
+    </div>
     <p class="suggest-sub">سجّل بإيميلك مرة واحدة، وتقدمك (كلماتك الصعبة، القصص المكتملة، مستواك...) يظهر تلقائياً بأي جهاز آخر تسجّل فيه بنفس الحساب.</p>
 
     <div id="accountLoggedOut">
@@ -27340,12 +27334,26 @@ function pullCloudThenReload(){
 }
 
 /* ---- [CLOUD ACCOUNT UI] ربط الواجهة (زر عائم + نافذة) بمصادقة Firebase ---- */
+function openCloudAccountModal(){
+  document.getElementById('accountOverlay').style.display = 'flex';
+}
+function closeCloudAccountModal(){
+  document.getElementById('accountOverlay').style.display = 'none';
+  const statusEl = document.getElementById('accountStatus');
+  if(statusEl){ statusEl.textContent = ''; statusEl.className = ''; }
+}
+function updateCloudAccountBadge(){
+  /* الصف id="topSettingsSyncToggle" موجود فقط عندما تكون الشاشة الرئيسية
+     معروضة — نتحقق من وجوده قبل أي تعديل حتى لا يحدث خطأ بباقي الشاشات */
+  const label = document.getElementById('topSettingsSyncLabel');
+  if(!label) return;
+  label.textContent = cloudUser ? 'متصل بالمزامنة ✓' : 'مزامنة التقدم عبر الأجهزة';
+}
+
 function initCloudAccountUI(){
-  const btn = document.getElementById('accountBtn');
   if(!CLOUD_SYNC_CONFIGURED || !window.firebaseAuth){
-    return; // الزر يبقى مخفياً (display:none الافتراضي) — لا تأثير على التطبيق
+    return; // لا حساب مُعد بعد — لا تأثير على التطبيق
   }
-  btn.style.display = 'flex';
 
   const overlay = document.getElementById('accountOverlay');
   const emailInput = document.getElementById('accountEmail');
@@ -27356,8 +27364,6 @@ function initCloudAccountUI(){
   const emailLabel = document.getElementById('accountEmailLabel');
   const syncStatusEl = document.getElementById('accountSyncStatus');
 
-  function openModal(){ overlay.style.display = 'flex'; }
-  function closeModal(){ overlay.style.display = 'none'; statusEl.textContent = ''; statusEl.className=''; }
   function showStatus(msg, ok){
     statusEl.textContent = msg;
     statusEl.className = ok ? 'success' : 'error';
@@ -27375,8 +27381,18 @@ function initCloudAccountUI(){
     return map[code] || 'حدث خطأ، حاول مرة أخرى';
   }
 
-  btn.onclick = openModal;
-  document.getElementById('accountCloseBtn').onclick = closeModal;
+  /* ---- إغلاق النافذة: تفويض الحدث على مستوى document بدل الاعتماد على
+     مستمعات فردية بالعناصر الفرعية — هذا يضمن عمل الإغلاق مهما كانت بيئة
+     العرض، لأن الحدث يُفحص بعد وصوله لجذر الصفحة لا حسب هندسة العنصر نفسه. ---- */
+  document.addEventListener('click', (e) => {
+    if(e.target.id === 'accountCloseBtn' || e.target.id === 'accountXBtn' || e.target.id === 'accountOverlay'){
+      e.preventDefault();
+      closeCloudAccountModal();
+    }
+  });
+  document.addEventListener('keydown', (e) => {
+    if(e.key === 'Escape' && overlay.style.display === 'flex') closeCloudAccountModal();
+  });
 
   let justSignedIn = false;
 
@@ -27404,26 +27420,24 @@ function initCloudAccountUI(){
   };
 
   function showSyncSuccessToast(callback){
-    const overlay = document.getElementById('syncSuccessOverlay');
+    const toastOverlay = document.getElementById('syncSuccessOverlay');
     const circle = document.getElementById('syncSuccessCircle');
     const tick = document.getElementById('syncSuccessTick');
     /* إعادة تشغيل الأنيميشن من الصفر في كل مرة */
     circle.style.animation = 'none'; tick.style.animation = 'none';
     void circle.offsetWidth;
     circle.style.animation = ''; tick.style.animation = '';
-    overlay.classList.add('show');
+    toastOverlay.classList.add('show');
     setTimeout(() => {
-      overlay.classList.remove('show');
+      toastOverlay.classList.remove('show');
       callback();
     }, 1300);
   }
 
   window.firebaseAuth.onAuthStateChanged(user => {
     cloudUser = user;
-    const btnLabel = document.getElementById('accountBtnLabel');
+    updateCloudAccountBadge();
     if(user){
-      btn.classList.add('is-synced');
-      btnLabel.textContent = 'متصل ✓';
       loggedOutBox.style.display = 'none';
       loggedInBox.style.display = 'block';
       emailLabel.textContent = '✅ مسجّل الدخول: ' + user.email;
@@ -27435,8 +27449,6 @@ function initCloudAccountUI(){
         pullCloudThenReload();
       }
     } else {
-      btn.classList.remove('is-synced');
-      btnLabel.textContent = 'مزامنة';
       loggedOutBox.style.display = 'block';
       loggedInBox.style.display = 'none';
     }
@@ -31125,9 +31137,22 @@ function renderHome(){
     <div class="tsp-level-list" id="topSettingsLevelList">
       <div class="tsp-level-list-inner" id="topSettingsLevelListInner"></div>
     </div>
+    ${(typeof CLOUD_SYNC_CONFIGURED !== 'undefined' && CLOUD_SYNC_CONFIGURED) ? `
+    <div class="tsp-divider"></div>
+    <button type="button" class="tsp-row" id="topSettingsSyncToggle" role="menuitem">
+      <span id="topSettingsSyncLabel">${(typeof cloudUser !== 'undefined' && cloudUser) ? 'متصل بالمزامنة ✓' : 'مزامنة التقدم عبر الأجهزة'}</span>
+      <span class="tsp-icon">☁️</span>
+    </button>` : ''}
   `;
   settingsWrap.appendChild(settingsBtn);
   settingsWrap.appendChild(settingsPanel);
+  const settingsSyncRow = settingsPanel.querySelector('#topSettingsSyncToggle');
+  if(settingsSyncRow){
+    settingsSyncRow.onclick = () => {
+      settingsPanel.classList.remove('open');
+      openCloudAccountModal();
+    };
+  }
 
   function syncSettingsThemeRow(){
     const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
