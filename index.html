@@ -5081,21 +5081,39 @@
      المستخدم أبداً تحميل النموذج لحظة الضغط على زر النطق. بمجرد اكتمال
      التحميل يصبح الصوت البشري متاحاً تلقائياً بالضغطة التالية. */
   window.__piperVoiceStored = { female:false, male:false };
+  window.__piperTTS.downloadProgress = {};
   window.__preloadPiperVoice = async function(gender){
     if(window.__piperVoiceStored[gender]) return true;
     try{
       const mod = await window.__loadPiperTTS();
-      if(!mod || typeof mod.stored !== 'function' || typeof mod.download !== 'function') return false;
+      if(!mod){
+        window.__piperTTS.moduleFailed = true;
+        return false;
+      }
+      if(typeof mod.stored !== 'function' || typeof mod.download !== 'function'){
+        window.__piperTTS.moduleFailed = true;
+        console.warn('Piper TTS: المكتبة تحمّلت لكن الدوال المتوقعة (stored/download) غير موجودة.', mod);
+        return false;
+      }
       const voiceId = (gender === 'male') ? 'en_US-hfc_male-medium' : 'en_US-hfc_female-medium';
       const storedVoices = await mod.stored().catch(() => []);
       if(storedVoices && storedVoices.includes(voiceId)){
         window.__piperVoiceStored[gender] = true;
         return true;
       }
-      await mod.download(voiceId);
+      window.__piperTTS.downloadProgress[gender] = 0;
+      await mod.download(voiceId, (progress) => {
+        if(progress && progress.total){
+          window.__piperTTS.downloadProgress[gender] = Math.round((progress.loaded * 100) / progress.total);
+        }
+      });
+      delete window.__piperTTS.downloadProgress[gender];
       window.__piperVoiceStored[gender] = true;
       return true;
     }catch(e){
+      delete window.__piperTTS.downloadProgress[gender];
+      window.__piperTTS.moduleFailed = true;
+      window.__piperTTS.lastError = (e && e.message) ? e.message : String(e);
       console.warn('Piper TTS: تعذّر تحميل نموذج الصوت مسبقاً بالخلفية.', e);
       return false;
     }
@@ -36662,6 +36680,37 @@ function buildSpeechSettings(){
 
   femaleBtn.onclick = () => { window.setPiperVoiceGender('female'); window.__preloadPiperVoice('female').catch(() => {}); refreshPiperBtns(); };
   maleBtn.onclick   = () => { window.setPiperVoiceGender('male');   window.__preloadPiperVoice('male').catch(() => {});   refreshPiperBtns(); };
+
+  /* عنصر حالة صغير يوضح للمستخدم بشكل مباشر: هل الصوت البشري يُحمَّل الآن،
+     جاهز فعلاً، أو تعذّر تحميله (بدل الصمت الكامل السابق الذي كان يجعل
+     المستخدم لا يعرف هل الميزة تعمل أصلاً أم لا) */
+  const piperStatus = document.createElement('span');
+  piperStatus.className = 'ss-piper-status';
+  piperStatus.style.cssText = 'font-size:11px;margin-inline-start:6px;color:var(--muted,#888);white-space:nowrap;';
+  piperWrap.appendChild(piperStatus);
+  window.__piperStatusEl = piperStatus;
+  window.__updatePiperStatusUI = function(){
+    const el = window.__piperStatusEl;
+    if(!el) return;
+    const g = window.getPiperVoiceGender ? window.getPiperVoiceGender() : 'female';
+    const st = (window.__piperTTS && window.__piperTTS.moduleFailed) ? 'moduleFailed'
+      : (window.__piperVoiceStored && window.__piperVoiceStored[g]) ? 'ready'
+      : (window.__piperTTS && window.__piperTTS.downloadProgress && window.__piperTTS.downloadProgress[g] != null) ? 'downloading'
+      : 'idle';
+    if(st === 'ready') el.textContent = '✅ جاهز';
+    else if(st === 'downloading') el.textContent = `⏬ ${window.__piperTTS.downloadProgress[g]}%`;
+    else if(st === 'moduleFailed') el.textContent = '⚠️ تعذّر التحميل (اضغط لإعادة المحاولة)';
+    else el.textContent = '⏳ لم يبدأ التحميل بعد';
+  };
+  piperStatus.style.cursor = 'pointer';
+  piperStatus.title = 'اضغط لإعادة محاولة تحميل الصوت البشري';
+  piperStatus.onclick = () => {
+    window.__piperTTS.moduleFailed = false;
+    const g = window.getPiperVoiceGender ? window.getPiperVoiceGender() : 'female';
+    window.__preloadPiperVoice(g).catch(() => {});
+  };
+  setInterval(() => window.__updatePiperStatusUI(), 500);
+  window.__updatePiperStatusUI();
 
   refreshPiperBtns();
   piperToggle.appendChild(femaleBtn);
