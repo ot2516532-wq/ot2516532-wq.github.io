@@ -5075,6 +5075,32 @@
      النطق أسرع. لا يؤثر على أي أداء أو وظيفة أخرى بالصفحة. */
   const _idle = window.requestIdleCallback || ((fn) => setTimeout(fn, 2000));
   _idle(() => { window.__loadPiperTTS().catch(() => {}); });
+
+  /* تحميل استباقي هادئ لنموذج الصوت البشري نفسه (الملف الكبير، عشرات
+     الميجابايت) بالخلفية دون أي علاقة بضغطات المستخدم، حتى لا ينتظر
+     المستخدم أبداً تحميل النموذج لحظة الضغط على زر النطق. بمجرد اكتمال
+     التحميل يصبح الصوت البشري متاحاً تلقائياً بالضغطة التالية. */
+  window.__piperVoiceStored = { female:false, male:false };
+  window.__preloadPiperVoice = async function(gender){
+    if(window.__piperVoiceStored[gender]) return true;
+    try{
+      const mod = await window.__loadPiperTTS();
+      if(!mod || typeof mod.stored !== 'function' || typeof mod.download !== 'function') return false;
+      const voiceId = (gender === 'male') ? 'en_US-hfc_male-medium' : 'en_US-hfc_female-medium';
+      const storedVoices = await mod.stored().catch(() => []);
+      if(storedVoices && storedVoices.includes(voiceId)){
+        window.__piperVoiceStored[gender] = true;
+        return true;
+      }
+      await mod.download(voiceId);
+      window.__piperVoiceStored[gender] = true;
+      return true;
+    }catch(e){
+      console.warn('Piper TTS: تعذّر تحميل نموذج الصوت مسبقاً بالخلفية.', e);
+      return false;
+    }
+  };
+  _idle(() => { window.__preloadPiperVoice('female').catch(() => {}); });
 </script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
@@ -36400,14 +36426,14 @@ async function _piperSynthesize(text, btn){
     if(typeof mod.stored === 'function' && typeof mod.download === 'function'){
       const storedVoices = await mod.stored().catch(() => []);
       if(!storedVoices || !storedVoices.includes(voiceId)){
-        const originalLabel = btn ? btn.textContent : null;
+        if(btn && btn.dataset.origLabel === undefined) btn.dataset.origLabel = btn.textContent;
         await mod.download(voiceId, (progress) => {
           if(btn && progress && progress.total){
             const pct = Math.round((progress.loaded * 100) / progress.total);
             btn.textContent = `⏬ تحميل الصوت البشري ${pct}%`;
           }
         });
-        if(btn && originalLabel !== null) btn.textContent = originalLabel;
+        if(btn && btn.dataset.origLabel !== undefined) btn.textContent = btn.dataset.origLabel;
       }
     }
 
@@ -36444,10 +36470,31 @@ window.speak = async function(text, _ignored, btn, wordsWrap){
   _clearFallbackTimers();
   _clearSyncHighlight(wordsWrap);
 
+  /* إن لم يكن Piper محمّلاً وجاهزاً بالفعل (مثلاً تعذّر الوصول لخوادمه، أو ما زال
+     يحمّل بالخلفية)، نشغّل الصوت الاحتياطي فوراً وبشكل متزامن دون أي انتظار،
+     حفاظاً على "بصمة تفاعل المستخدم" (user gesture) اللحظية التي تتطلبها أغلب
+     المتصفحات (خصوصاً الموبايل) لتشغيل الصوت؛ أي تأخير هنا يجعل المتصفح يرفض
+     تشغيل الصوت بصمت دون أي خطأ ظاهر */
+  if(!window.__piperTTS || !window.__piperTTS.ready){
+    return window.__legacySpeak(text, _ignored, btn, wordsWrap);
+  }
+  const _gender = _getPiperGender();
+  if(!window.__piperVoiceStored || !window.__piperVoiceStored[_gender]){
+    /* النموذج لم يكتمل تحميله بعد بالخلفية: استخدم الصوت الاحتياطي فوراً
+       دون أي انتظار، وابدأ (أو تابع) تحميل النموذج بهدوء لهذا الصوت
+       تحديداً حتى يصبح جاهزاً للضغطات القادمة */
+    window.__preloadPiperVoice(_gender).catch(() => {});
+    return window.__legacySpeak(text, _ignored, btn, wordsWrap);
+  }
+
   let wavBlob = null;
-  try{ wavBlob = await _piperSynthesize(text, btn); }catch(e){ wavBlob = null; }
+  try{
+    const timeoutPromise = new Promise((resolve) => setTimeout(() => resolve(null), 3000));
+    wavBlob = await Promise.race([ _piperSynthesize(text, btn), timeoutPromise ]);
+  }catch(e){ wavBlob = null; }
 
   if(!wavBlob){
+    if(btn) btn.textContent = btn.dataset.origLabel || btn.textContent;
     return window.__legacySpeak(text, _ignored, btn, wordsWrap);
   }
 
@@ -36486,7 +36533,11 @@ window.speak = async function(text, _ignored, btn, wordsWrap){
         });
       });
     }
-    audioEl.play();
+    audioEl.play().catch((playErr) => {
+      console.warn('Piper TTS: فشل تشغيل الصوت (autoplay/آخر)، رجوع للصوت الاحتياطي.', playErr);
+      cleanup();
+      window.__legacySpeak(text, _ignored, btn, wordsWrap);
+    });
   }catch(e){
     return window.__legacySpeak(text, _ignored, btn, wordsWrap);
   }
@@ -36609,8 +36660,8 @@ function buildSpeechSettings(){
     });
   };
 
-  femaleBtn.onclick = () => { window.setPiperVoiceGender('female'); refreshPiperBtns(); };
-  maleBtn.onclick   = () => { window.setPiperVoiceGender('male');   refreshPiperBtns(); };
+  femaleBtn.onclick = () => { window.setPiperVoiceGender('female'); window.__preloadPiperVoice('female').catch(() => {}); refreshPiperBtns(); };
+  maleBtn.onclick   = () => { window.setPiperVoiceGender('male');   window.__preloadPiperVoice('male').catch(() => {});   refreshPiperBtns(); };
 
   refreshPiperBtns();
   piperToggle.appendChild(femaleBtn);
