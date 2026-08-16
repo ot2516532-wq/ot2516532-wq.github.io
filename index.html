@@ -5082,8 +5082,31 @@
      التحميل يصبح الصوت البشري متاحاً تلقائياً بالضغطة التالية. */
   window.__piperVoiceStored = { female:false, male:false };
   window.__piperTTS.downloadProgress = {};
+  window.__piperTTS.warmed = {};
+  window.__warmUpPiperVoice = async function(gender, mod, voiceId){
+    if(window.__piperTTS.warmed[gender]) return;
+    try{
+      if(typeof mod.predict === 'function'){
+        await mod.predict({ text: 'hi', voiceId });
+      } else if(mod.TtsSession){
+        if(!window.__piperSession || window.__piperSessionVoice !== voiceId){
+          window.__piperSession = new mod.TtsSession({ voiceId });
+          window.__piperSessionVoice = voiceId;
+        }
+        await window.__piperSession.predict({ text: 'hi', voiceId });
+      }
+      window.__piperTTS.warmed[gender] = true;
+    }catch(e){
+      console.warn('Piper TTS: فشلت التهيئة المسبقة (warm-up)، سيحاول لاحقاً عند أول استخدام فعلي.', e);
+    }
+  };
   window.__preloadPiperVoice = async function(gender){
-    if(window.__piperVoiceStored[gender]) return true;
+    const voiceId = (gender === 'male') ? 'en_US-hfc_male-medium' : 'en_US-hfc_female-medium';
+    if(window.__piperVoiceStored[gender]){
+      const mod = await window.__loadPiperTTS().catch(() => null);
+      if(mod) window.__warmUpPiperVoice(gender, mod, voiceId).catch(() => {});
+      return true;
+    }
     try{
       const mod = await window.__loadPiperTTS();
       if(!mod){
@@ -5095,10 +5118,10 @@
         console.warn('Piper TTS: المكتبة تحمّلت لكن الدوال المتوقعة (stored/download) غير موجودة.', mod);
         return false;
       }
-      const voiceId = (gender === 'male') ? 'en_US-hfc_male-medium' : 'en_US-hfc_female-medium';
       const storedVoices = await mod.stored().catch(() => []);
       if(storedVoices && storedVoices.includes(voiceId)){
         window.__piperVoiceStored[gender] = true;
+        window.__warmUpPiperVoice(gender, mod, voiceId).catch(() => {});
         return true;
       }
       window.__piperTTS.downloadProgress[gender] = 0;
@@ -5109,6 +5132,8 @@
       });
       delete window.__piperTTS.downloadProgress[gender];
       window.__piperVoiceStored[gender] = true;
+      /* تهيئة صامتة فور اكتمال التحميل، دون انتظار المستخدم */
+      window.__warmUpPiperVoice(gender, mod, voiceId).catch(() => {});
       return true;
     }catch(e){
       delete window.__piperTTS.downloadProgress[gender];
@@ -36354,18 +36379,27 @@ function speak(text, _ignored, btn, wordsWrap){
       u.onend  = () => { _clearFallbackTimers(); _clearSyncHighlight(wordsWrap); };
       u.onerror = () => { _clearFallbackTimers(); _clearSyncHighlight(wordsWrap); };
     }
-    /* SYNC READ-ALOUD: تظليل الكلمة المسموعة حالياً كلمة كلمة (كاريوكي) */
+    /* SYNC READ-ALOUD: تظليل الكلمة المسموعة حالياً كلمة كلمة (كاريوكي)
+       — نظام هجين احترافي:
+       1) يعتمد على أحداث onboundary الحقيقية للمزامنة الدقيقة عند توفرها
+       2) يُعايِر معدل السرعة الفعلي تلقائياً من فروقات الأحداث الحقيقية
+          (بدل افتراض ثابت)، فلا يتراكم الفارق مع طول النص
+       3) مراقب (watchdog) دوري يتقدّم بالتظليل تلقائياً إن توقفت الأحداث
+          الحقيقية عن الوصول لفترة (بدل التجمّد التام منتصف الجملة، وهو
+          سلوك شائع في متصفحات الموبايل/أندرويد) */
     if(SYNC_READ_ALOUD && wordsWrap){
       const ranges = _syncWordRanges.get(wordsWrap) || computeWordRanges(wordsWrap);
       let lastSpan = null;
-      let usedRealBoundary = false;
+      const totalChars = text.length || 1;
+      const baseCharsPerSec = 12 * (u.rate || 1);
+      let calibratedCharsPerSec = baseCharsPerSec;
+      let lastRealTime = performance.now();
+      let lastRealCharIndex = 0;
+      let haveRealAnchor = false;
 
-      u.onboundary = (event) => {
-        if(event.name && event.name !== 'word') return;
-        if(!usedRealBoundary){ usedRealBoundary = true; _clearFallbackTimers(); }
-        const idx = event.charIndex;
-        const match = ranges.find(r => idx >= r.start && idx < r.end)
-          || ranges.find(r => idx <= r.start); /* احتياط لو لم يقع المؤشر داخل أي نطاق بدقة */
+      const highlightAt = (charIdx) => {
+        const match = ranges.find(r => charIdx >= r.start && charIdx < r.end)
+          || ranges.find(r => charIdx <= r.start);
         if(match && match.span !== lastSpan){
           if(lastSpan) lastSpan.classList.remove('sync-highlight');
           match.span.classList.add('sync-highlight');
@@ -36373,38 +36407,75 @@ function speak(text, _ignored, btn, wordsWrap){
         }
       };
 
-      /* ---- خطة احتياطية (Fallback) ----
-         بعض المتصفحات/الأصوات (خصوصاً موبايل وSafari وبعض أصوات الشبكة في
-         Chrome) لا تُصدر حدث onboundary إطلاقاً رغم دعمها للنطق نفسه، فيبقى
-         التظليل معطلاً تماماً بصمت دون أي رسالة خطأ. لتفادي ذلك: نُجدوِل
-         تظليلاً تقديرياً بمحاكاة إيقاع الكلام الطبيعي — سرعة أساسية لكل حرف
-         + توقف إضافي عند علامات الترقيم (فاصلة/نقطة...) التي يتوقف عندها أي
-         متحدث فعلياً، حتى لا يتراكم الفارق بين الصوت والتظليل مع تقدم الجملة.
-         يُلغى فوراً بمجرد وصول أول حدث onboundary حقيقي (فيُعتمد حينها
-         التزامن الدقيق الفعلي بدل التقدير). */
-      const estCharsPerSec = 12 * (u.rate || 1);
+      u.onboundary = (event) => {
+        if(event.name && event.name !== 'word' && event.name !== 'sentence') return;
+        const now = performance.now();
+        const charIdx = event.charIndex || 0;
+        if(haveRealAnchor && charIdx > lastRealCharIndex){
+          const elapsedMs = now - lastRealTime;
+          const charsDelta = charIdx - lastRealCharIndex;
+          if(elapsedMs > 50 && charsDelta > 0){
+            /* مزج ناعم بين المعدل السابق والمعدل المُقاس الآن، لتفادي
+               قفزات مفاجئة إن جاء حدث واحد شاذ التوقيت */
+            const instRate = (charsDelta / elapsedMs) * 1000;
+            calibratedCharsPerSec = calibratedCharsPerSec * 0.5 + instRate * 0.5;
+          }
+        }
+        lastRealTime = now;
+        lastRealCharIndex = charIdx;
+        haveRealAnchor = true;
+        highlightAt(charIdx);
+      };
+
+      /* مراقب دوري: إن لم يصل أي حدث حقيقي منذ فترة (توقّف مفاجئ شائع في
+         بعض متصفحات الموبايل)، يواصل التقدّم بالتظليل تقديرياً بالاعتماد
+         على آخر نقطة معروفة + المعدل المُعايَر، بدل ترك التظليل متجمداً */
+      const WATCHDOG_STALL_MS = 900;
+      const watchdogId = setInterval(() => {
+        if(!window.speechSynthesis.speaking) return;
+        const now = performance.now();
+        const sinceReal = now - lastRealTime;
+        if(sinceReal > WATCHDOG_STALL_MS){
+          const rate = calibratedCharsPerSec || baseCharsPerSec;
+          const estCharIdx = lastRealCharIndex + (sinceReal / 1000) * rate;
+          highlightAt(Math.min(estCharIdx, totalChars - 1));
+        }
+      }, 150);
+      _activeFallbackTimers.push(watchdogId);
+
+      /* خطة بداية فورية: تظليل تقديري بمحاكاة إيقاع الكلام الطبيعي (سرعة
+         أساسية لكل حرف + توقف إضافي عند علامات الترقيم) يعمل من أول لحظة
+         حتى وصول أول حدث حقيقي، حتى لا يبدأ التظليل متأخراً أو لا يظهر
+         إطلاقاً إن كان المتصفح لا يدعم onboundary أبداً */
       const PUNCT_PAUSE_MS = { ',':180, ';':180, ':':180, '.':320, '!':320, '?':320 };
       let cumMs = 0;
       let prevEnd = 0;
       ranges.forEach(r => {
         const gapChars = Math.max(0, r.start - prevEnd);
-        cumMs += (gapChars / estCharsPerSec) * 1000; /* وقت المسافة/الفاصلة السابقة */
+        cumMs += (gapChars / baseCharsPerSec) * 1000;
         const delayMs = cumMs;
         const id = setTimeout(() => {
-          if(usedRealBoundary) return;
-          if(lastSpan) lastSpan.classList.remove('sync-highlight');
-          r.span.classList.add('sync-highlight');
-          lastSpan = r.span;
+          if(haveRealAnchor) return; /* توقف فور وصول أول حدث حقيقي فعلي */
+          highlightAt(r.start);
         }, delayMs);
         _activeFallbackTimers.push(id);
 
         const wordChars = r.end - r.start;
-        cumMs += (wordChars / estCharsPerSec) * 1000; /* زمن نطق الكلمة نفسها */
+        cumMs += (wordChars / baseCharsPerSec) * 1000;
         const trailingPunct = text.slice(r.start, r.end).match(/[.,;:!?]+$/);
-        if(trailingPunct) cumMs += PUNCT_PAUSE_MS[trailingPunct[0][0]] || 0; /* توقف بعد الترقيم */
+        if(trailingPunct) cumMs += PUNCT_PAUSE_MS[trailingPunct[0][0]] || 0;
         prevEnd = r.end;
       });
     }
+
+    /* إصلاح خلل معروف في Chrome: يتوقف speechSynthesis تلقائياً بعد نحو
+       15 ثانية من الكلام المتواصل دون سبب ظاهر. الحل الموثّق: استدعاء
+       pause()+resume() دورياً أثناء الكلام "لإنعاش" المشغّل الداخلي. */
+    const keepAliveId = setInterval(() => {
+      if(!window.speechSynthesis.speaking){ return; }
+      try{ window.speechSynthesis.pause(); window.speechSynthesis.resume(); }catch(e){}
+    }, 12000);
+    _activeFallbackTimers.push(keepAliveId);
     window.speechSynthesis.speak(u);
   }catch(e){
     if(btn) btn.classList.remove('speaking');
@@ -36507,7 +36578,7 @@ window.speak = async function(text, _ignored, btn, wordsWrap){
 
   let wavBlob = null;
   try{
-    const timeoutPromise = new Promise((resolve) => setTimeout(() => resolve(null), 3000));
+    const timeoutPromise = new Promise((resolve) => setTimeout(() => resolve(null), 7000));
     wavBlob = await Promise.race([ _piperSynthesize(text, btn), timeoutPromise ]);
   }catch(e){ wavBlob = null; }
 
@@ -36533,15 +36604,32 @@ window.speak = async function(text, _ignored, btn, wordsWrap){
     audioEl.onerror = () => { cleanup(); window.__legacySpeak(text, _ignored, btn, wordsWrap); };
 
     /* تظليل تقديري للكلمات (كاريوكي) بالتناسب مع طول الصوت الفعلي بعد توليده،
-       لأن Piper لا يصدر أحداث onboundary مثل speechSynthesis */
+       لأن Piper لا يصدر أحداث onboundary مثل speechSynthesis. نستخدم وزناً
+       إضافياً لعلامات الترقيم (فاصلة/نقطة...) بدل توزيع خطي بسيط حسب عدد
+       الأحرف فقط، لأن أي متحدث فعلي يتوقف عندها فيسبب ذلك انحرافاً تراكمياً
+       مع طول الجملة لو تم تجاهله. */
     if(SYNC_READ_ALOUD && wordsWrap){
       const ranges = _syncWordRanges.get(wordsWrap) || computeWordRanges(wordsWrap);
       let lastSpan = null;
+      const PUNCT_PAUSE_CHARS = { ',':2.2, ';':2.2, ':':2.2, '.':4, '!':4, '?':4 };
       audioEl.addEventListener('loadedmetadata', () => {
         const totalMs = (audioEl.duration || 0) * 1000;
-        const totalChars = text.length || 1;
-        ranges.forEach(r => {
-          const delayMs = (r.start / totalChars) * totalMs;
+        /* حساب "الوزن" التراكمي لكل كلمة (طولها + وزن أي ترقيم يسبقها) */
+        const weights = [];
+        let cum = 0;
+        let prevEnd = 0;
+        ranges.forEach((r, i) => {
+          const gapChars = Math.max(0, r.start - prevEnd);
+          cum += gapChars;
+          weights[i] = cum; /* موضع بداية الكلمة بالوزن التراكمي */
+          cum += (r.end - r.start);
+          const trailingPunct = text.slice(r.start, r.end).match(/[.,;:!?]+$/);
+          if(trailingPunct) cum += PUNCT_PAUSE_CHARS[trailingPunct[0][0]] || 0;
+          prevEnd = r.end;
+        });
+        const totalWeight = cum || 1;
+        ranges.forEach((r, i) => {
+          const delayMs = (weights[i] / totalWeight) * totalMs;
           const id = setTimeout(() => {
             if(lastSpan) lastSpan.classList.remove('sync-highlight');
             r.span.classList.add('sync-highlight');
