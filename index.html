@@ -5143,7 +5143,10 @@
       return false;
     }
   };
-  _idle(() => { window.__preloadPiperVoice('female').catch(() => {}); });
+  _idle(() => {
+    const savedGender = (window.getPiperVoiceGender ? window.getPiperVoiceGender() : null) || 'female';
+    window.__preloadPiperVoice(savedGender).catch(() => {});
+  });
 </script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
@@ -36504,7 +36507,37 @@ window.setPiperVoiceGender = function(g){
 };
 window.getPiperVoiceGender = _getPiperGender;
 
-async function _piperSynthesize(text, btn){
+/* تقسيم النص لجُمل منفصلة (بدل إرسال الفقرة كاملة دفعة واحدة) لكل واحدة
+   منها استدعاء توليد صوت مستقل. نماذج الصوت العصبي مثل Piper مُدرَّبة على
+   جملة واحدة قصيرة، وإرسال أكثر من جملة معاً في نداء واحد يجعلها "تتسرّع"
+   وتبتلع أحرفاً/كلمات عند الانتقال بين الجمل — تقسيمها يحاكي كيف يُستخدم
+   Piper فعلياً في التطبيقات الاحترافية. */
+function _splitIntoSentences(text){
+  const out = [];
+  const re = /[^.!?]+[.!?]*\s*/g;
+  let m;
+  while((m = re.exec(text)) !== null){
+    const raw = m[0];
+    const trimmedEnd = raw.replace(/\s+$/, '');
+    const t = trimmedEnd.trim();
+    if(t) out.push({ text: t, start: m.index, end: m.index + trimmedEnd.length });
+  }
+  if(out.length === 0) out.push({ text: text.trim(), start: 0, end: text.length });
+  return out;
+}
+
+/* تطبيع علامات الترقيم "الذكية" (اقتباس/شرطات منحنية) إلى أشكالها البسيطة،
+   لأن محرك النطق الداخلي (espeak) المستخدم في Piper قد لا يتعرف عليها
+   فيُسقط جزءاً من الجملة بصمت أو يلفظها بشكل خاطئ */
+function _normalizeForPiper(t){
+  return t
+    .replace(/[\u201C\u201D]/g, '"')
+    .replace(/[\u2018\u2019]/g, "'")
+    .replace(/[\u2013\u2014]/g, '-')
+    .replace(/\u2026/g, '...');
+}
+
+async function _piperSynthesizeSentences(text, btn){
   const mod = await window.__loadPiperTTS();
   if(!mod) return null;
   try{
@@ -36526,17 +36559,23 @@ async function _piperSynthesize(text, btn){
       }
     }
 
-    let wavBlob = null;
-    if(typeof mod.predict === 'function'){
-      wavBlob = await mod.predict({ text, voiceId });
-    } else if(mod.TtsSession){
-      if(!window.__piperSession || window.__piperSessionVoice !== voiceId){
-        window.__piperSession = new mod.TtsSession({ voiceId });
-        window.__piperSessionVoice = voiceId;
+    const sentences = _splitIntoSentences(text);
+    const clips = [];
+    for(const s of sentences){
+      const cleanText = _normalizeForPiper(s.text);
+      let blob = null;
+      if(typeof mod.predict === 'function'){
+        blob = await mod.predict({ text: cleanText, voiceId });
+      } else if(mod.TtsSession){
+        if(!window.__piperSession || window.__piperSessionVoice !== voiceId){
+          window.__piperSession = new mod.TtsSession({ voiceId });
+          window.__piperSessionVoice = voiceId;
+        }
+        blob = await window.__piperSession.predict({ text: cleanText, voiceId });
       }
-      wavBlob = await window.__piperSession.predict({ text, voiceId });
+      if(blob) clips.push({ blob, start: s.start, end: s.end });
     }
-    return wavBlob || null;
+    return clips.length ? clips : null;
   }catch(e){
     console.warn('Piper TTS: فشل توليد الصوت، سيُستخدم الصوت الاحتياطي.', e);
     return null;
@@ -36576,74 +36615,84 @@ window.speak = async function(text, _ignored, btn, wordsWrap){
     return window.__legacySpeak(text, _ignored, btn, wordsWrap);
   }
 
-  let wavBlob = null;
+  let clips = null;
   try{
-    const timeoutPromise = new Promise((resolve) => setTimeout(() => resolve(null), 7000));
-    wavBlob = await Promise.race([ _piperSynthesize(text, btn), timeoutPromise ]);
-  }catch(e){ wavBlob = null; }
+    const timeoutPromise = new Promise((resolve) => setTimeout(() => resolve(null), 9000));
+    clips = await Promise.race([ _piperSynthesizeSentences(text, btn), timeoutPromise ]);
+  }catch(e){ clips = null; }
 
-  if(!wavBlob){
+  if(!clips || !clips.length){
     if(btn) btn.textContent = btn.dataset.origLabel || btn.textContent;
     return window.__legacySpeak(text, _ignored, btn, wordsWrap);
   }
 
   try{
-    const audioUrl = URL.createObjectURL(wavBlob);
-    const audioEl = new Audio(audioUrl);
-    window.__currentPiperAudio = audioEl;
     if(btn) btn.classList.add('speaking');
+    const ranges = (SYNC_READ_ALOUD && wordsWrap) ? (_syncWordRanges.get(wordsWrap) || computeWordRanges(wordsWrap)) : null;
+    let lastSpan = null;
+    const PUNCT_PAUSE_CHARS = { ',':2.2, ';':2.2, ':':2.2, '.':4, '!':4, '?':4 };
 
-    const cleanup = () => {
+    const cleanupAll = () => {
       if(btn) btn.classList.remove('speaking');
       _clearFallbackTimers();
       _clearSyncHighlight(wordsWrap);
-      URL.revokeObjectURL(audioUrl);
-      if(window.__currentPiperAudio === audioEl) window.__currentPiperAudio = null;
+      window.__currentPiperAudio = null;
     };
-    audioEl.onended = cleanup;
-    audioEl.onerror = () => { cleanup(); window.__legacySpeak(text, _ignored, btn, wordsWrap); };
 
-    /* تظليل تقديري للكلمات (كاريوكي) بالتناسب مع طول الصوت الفعلي بعد توليده،
-       لأن Piper لا يصدر أحداث onboundary مثل speechSynthesis. نستخدم وزناً
-       إضافياً لعلامات الترقيم (فاصلة/نقطة...) بدل توزيع خطي بسيط حسب عدد
-       الأحرف فقط، لأن أي متحدث فعلي يتوقف عندها فيسبب ذلك انحرافاً تراكمياً
-       مع طول الجملة لو تم تجاهله. */
-    if(SYNC_READ_ALOUD && wordsWrap){
-      const ranges = _syncWordRanges.get(wordsWrap) || computeWordRanges(wordsWrap);
-      let lastSpan = null;
-      const PUNCT_PAUSE_CHARS = { ',':2.2, ';':2.2, ':':2.2, '.':4, '!':4, '?':4 };
-      audioEl.addEventListener('loadedmetadata', () => {
-        const totalMs = (audioEl.duration || 0) * 1000;
-        /* حساب "الوزن" التراكمي لكل كلمة (طولها + وزن أي ترقيم يسبقها) */
-        const weights = [];
-        let cum = 0;
-        let prevEnd = 0;
-        ranges.forEach((r, i) => {
-          const gapChars = Math.max(0, r.start - prevEnd);
-          cum += gapChars;
-          weights[i] = cum; /* موضع بداية الكلمة بالوزن التراكمي */
-          cum += (r.end - r.start);
-          const trailingPunct = text.slice(r.start, r.end).match(/[.,;:!?]+$/);
-          if(trailingPunct) cum += PUNCT_PAUSE_CHARS[trailingPunct[0][0]] || 0;
-          prevEnd = r.end;
+    /* تشغيل مقاطع الجُمل بالتسلسل الواحد تلو الآخر (لا تتراكم/تتداخل)،
+       مع تظليل الكلمات ضمن نطاق كل جملة بحسب مدتها الفعلية الخاصة بها */
+    let clipIndex = 0;
+    const playNextClip = () => {
+      if(clipIndex >= clips.length){ cleanupAll(); return; }
+      const clip = clips[clipIndex++];
+      const audioUrl = URL.createObjectURL(clip.blob);
+      const audioEl = new Audio(audioUrl);
+      window.__currentPiperAudio = audioEl;
+
+      const onDoneClip = () => {
+        URL.revokeObjectURL(audioUrl);
+        if(window.__currentPiperAudio === audioEl) window.__currentPiperAudio = null;
+        playNextClip();
+      };
+      audioEl.onended = onDoneClip;
+      audioEl.onerror = () => { URL.revokeObjectURL(audioUrl); cleanupAll(); window.__legacySpeak(text, _ignored, btn, wordsWrap); };
+
+      if(ranges){
+        const clipRanges = ranges.filter(r => r.start >= clip.start && r.start < clip.end);
+        audioEl.addEventListener('loadedmetadata', () => {
+          const totalMs = (audioEl.duration || 0) * 1000;
+          const weights = [];
+          let cum = 0;
+          let prevEnd = clip.start;
+          clipRanges.forEach((r, i) => {
+            const gapChars = Math.max(0, r.start - prevEnd);
+            cum += gapChars;
+            weights[i] = cum;
+            cum += (r.end - r.start);
+            const trailingPunct = text.slice(r.start, r.end).match(/[.,;:!?]+$/);
+            if(trailingPunct) cum += PUNCT_PAUSE_CHARS[trailingPunct[0][0]] || 0;
+            prevEnd = r.end;
+          });
+          const totalWeight = cum || 1;
+          clipRanges.forEach((r, i) => {
+            const delayMs = (weights[i] / totalWeight) * totalMs;
+            const id = setTimeout(() => {
+              if(lastSpan) lastSpan.classList.remove('sync-highlight');
+              r.span.classList.add('sync-highlight');
+              lastSpan = r.span;
+            }, delayMs);
+            _activeFallbackTimers.push(id);
+          });
         });
-        const totalWeight = cum || 1;
-        ranges.forEach((r, i) => {
-          const delayMs = (weights[i] / totalWeight) * totalMs;
-          const id = setTimeout(() => {
-            if(lastSpan) lastSpan.classList.remove('sync-highlight');
-            r.span.classList.add('sync-highlight');
-            lastSpan = r.span;
-          }, delayMs);
-          _activeFallbackTimers.push(id);
-        });
+      }
+      audioEl.play().catch((playErr) => {
+        console.warn('Piper TTS: فشل تشغيل الصوت (autoplay/آخر)، رجوع للصوت الاحتياطي.', playErr);
+        URL.revokeObjectURL(audioUrl);
+        cleanupAll();
+        window.__legacySpeak(text, _ignored, btn, wordsWrap);
       });
-    }
-    audioEl.play().catch((playErr) => {
-      console.warn('Piper TTS: فشل تشغيل الصوت (autoplay/آخر)، رجوع للصوت الاحتياطي.', playErr);
-      cleanup();
-      window.__legacySpeak(text, _ignored, btn, wordsWrap);
-    });
+    };
+    playNextClip();
   }catch(e){
     return window.__legacySpeak(text, _ignored, btn, wordsWrap);
   }
