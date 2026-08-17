@@ -556,6 +556,7 @@
     display:flex;
     align-items:center;
     gap:10px;
+    flex-wrap:wrap;
   }
   .ss-row-controls{
     justify-content:space-between;
@@ -36647,6 +36648,11 @@ window.speak = async function(text, _ignored, btn, wordsWrap){
       const clip = clips[clipIndex++];
       const audioUrl = URL.createObjectURL(clip.blob);
       const audioEl = new Audio(audioUrl);
+      /* محرك Piper لا يقبل معامل سرعة عند توليد الصوت نفسه، لذا نطبّق
+         السرعة المختارة من المستخدم على تشغيل الصوت الناتج مباشرة، وهذا
+         هو الأسلوب المعتمد عالمياً في كل مشغلات الصوت للتحكم بالسرعة دون
+         التأثير على جودة الصوت أو طبقته (pitch) بشكل كبير */
+      audioEl.playbackRate = _speechRate || 0.95;
       window.__currentPiperAudio = audioEl;
 
       const onDoneClip = () => {
@@ -36660,7 +36666,10 @@ window.speak = async function(text, _ignored, btn, wordsWrap){
       if(ranges){
         const clipRanges = ranges.filter(r => r.start >= clip.start && r.start < clip.end);
         audioEl.addEventListener('loadedmetadata', () => {
-          const totalMs = (audioEl.duration || 0) * 1000;
+          /* المدة المُبلَّغة (duration) هي مدة الصوت الأصلية بسرعته الطبيعية؛
+             نقسمها على سرعة التشغيل الفعلية للحصول على المدة الحقيقية على
+             أرض الواقع، وإلا ينحرف التظليل عن الصوت عند تغيير السرعة */
+          const totalMs = ((audioEl.duration || 0) / (audioEl.playbackRate || 1)) * 1000;
           const weights = [];
           let cum = 0;
           let prevEnd = clip.start;
@@ -36799,7 +36808,7 @@ function buildSpeechSettings(){
     b.type = 'button';
     b.textContent = label;
     b.dataset.gender = genderVal;
-    b.style.cssText = 'border:none;background:transparent;padding:4px 12px;font-size:13px;cursor:pointer;transition:background .15s,color .15s;';
+    b.style.cssText = 'border:none;background:transparent;padding:4px 12px;font-size:13px;cursor:pointer;transition:background .15s,color .15s;flex-shrink:0;white-space:nowrap;';
     return b;
   };
   const femaleBtn = mkPiperBtn('👩 نسائي', 'female');
@@ -38173,13 +38182,18 @@ function renderHome(){
       content.appendChild(filterWrap);
     }
 
-    const activePart = getActivePartNum(p1, p2, p3);
-    const p1Section = buildPartSection(p1, lvlCss, lvlLabel, 1, activePart === 1);
-    const p2Section = buildPartSection(p2, lvlCss, lvlLabel, 2, activePart === 2);
-    const p3Section = buildPartSection(p3, lvlCss, lvlLabel, 3, activePart === 3);
-    if(p1Section) content.appendChild(p1Section);
-    if(p2Section) content.appendChild(p2Section);
-    if(p3Section) content.appendChild(p3Section);
+    /* ---- دمج كل قصص المستوى (مبتدئ + متقدم + إضافي) في قائمة واحدة
+       متصلة، بدل ثلاثة أقسام منفصلة قابلة للطي — الترتيب نفسه المستخدم
+       أصلاً في نظام الفتح التتابعي (getLevelStorySequence)، فلا يتأثر أي
+       شيء متعلق بقفل/فتح القصص. ---- */
+    const mergedIds = [...p1, ...p2, ...p3];
+    if(mergedIds.length){
+      const mergedCurrentId = mergedIds.find(id => isStoryUnlocked(id) && !getStoryState(id).completed) || null;
+      const mergedGrid = document.createElement('div');
+      mergedGrid.className = 'story-grid';
+      mergedIds.forEach(id => mergedGrid.appendChild(buildStoryItem(id, lvlCss, lvlLabel, id === mergedCurrentId)));
+      content.appendChild(mergedGrid);
+    }
 
     levelBox.onclick = () => {
       const isOpen = section.classList.contains('open');
